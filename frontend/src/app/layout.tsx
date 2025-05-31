@@ -1,35 +1,25 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type React from "react";
 import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Navigation } from "@/components/navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Death Note",
-  description: "Death Note is a TOEIC writing tools.",
+  title: "TOEIC Writing Test System",
+  description: "Online TOEIC Writing Test Platform",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/next.svg" type="image/svg+xml" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={inter.className}>
+        <Navigation />
         {children}
       </body>
     </html>
