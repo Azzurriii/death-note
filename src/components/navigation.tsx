@@ -69,7 +69,7 @@ export function Navigation() {
             </Button>
           </Link>
 
-          <Link href="/history">
+          {/* <Link href="/history">
             <Button
               variant={pathname.startsWith("/history") ? "default" : "ghost"}
               size="sm"
@@ -78,7 +78,7 @@ export function Navigation() {
               <History className="h-4 w-4" />
               <span>History</span>
             </Button>
-          </Link>
+          </Link> */}
 
           <Link href="/add-exam">
             <Button

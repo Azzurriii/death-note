@@ -226,24 +226,6 @@ export default function Part3Page() {
                 </div>
               </div>
 
-              <div className="bg-amber-50 rounded-lg border border-amber-200 mb-6">
-                <h4 className="font-medium text-amber-800 mb-2">
-                  Essay Structure Tips:
-                </h4>
-                <ul className="text-sm text-amber-700 space-y-1">
-                  <li>
-                    • <strong>Introduction:</strong> State your opinion clearly
-                  </li>
-                  <li>
-                    • <strong>Body:</strong> Provide 2-3 supporting reasons with
-                    examples
-                  </li>
-                  <li>
-                    • <strong>Conclusion:</strong> Summarize your position
-                  </li>
-                </ul>
-              </div>
-
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">
                   Your Essay:

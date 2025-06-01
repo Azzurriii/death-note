@@ -18,6 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/images/death-note.svg" />
+      </head>
       <body className={inter.className}>
         <Navigation />
         {children}
