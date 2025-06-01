@@ -137,7 +137,7 @@ export default function ExamListPage() {
           </p>
         </div>
 
-        {tests.length === 0 ? (
+        {!tests || tests.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 text-lg">
               No exams available at the moment.
