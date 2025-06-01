@@ -8,18 +8,41 @@ import * as React from "react";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const router = useRouter();
+
+  // Check if user is already logged in
+  React.useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      // User is already logged in, redirect to home
+      router.push("/");
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Here you would implement your actual login logic
-    setTimeout(() => {
+    // Simple temporary login logic
+    if (username && password) {
+      // Generate a simple user ID or use the username
+      const userId = `user_${username}_${Date.now()}`;
+
+      // Save user ID to localStorage
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("username", username);
+
+      setTimeout(() => {
+        setIsLoading(false);
+        // Redirect to home after successful login
+        router.push("/");
+      }, 1000);
+    } else {
       setIsLoading(false);
-      // Redirect after login
-      router.push("/");
-    }, 1000);
+      alert("Please enter both username and password");
+    }
   };
 
   return (
@@ -41,16 +64,18 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium">
-                Email address
+                Username
               </label>
               <div className="mt-1">
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  autoComplete="email"
+                  id="username"
+                  type="text"
+                  placeholder="Username"
+                  autoComplete="username"
                   required
                   disabled={isLoading}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
@@ -76,6 +101,8 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   required
                   disabled={isLoading}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>

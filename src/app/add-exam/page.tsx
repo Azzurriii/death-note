@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { LoadingSpinner } from "@/components/ui/loading";
 import { Save, ArrowLeft, Loader2 } from "lucide-react";
 import { testService } from "@/services/testService";
 import { CreateTestRequest } from "@/types/test";
@@ -15,6 +16,7 @@ import { CreateTestRequest } from "@/types/test";
 export default function AddExamPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [examTitle, setExamTitle] = useState("");
   const [examDescription, setExamDescription] = useState("");
 
@@ -42,6 +44,27 @@ export default function AddExamPage() {
     title: "Task 3 - Question 8: Opinion Essay",
     prompt: "",
   });
+
+  // Check authentication status first
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      // User is not logged in, redirect to login
+      router.push("/login");
+    } else {
+      // User is logged in, allow access
+      setIsAuthenticating(false);
+    }
+  }, [router]);
+
+  // Show loading while checking authentication
+  if (isAuthenticating) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   const handlePart1Change = (
     index: number,

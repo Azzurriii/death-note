@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,34 +11,61 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LoadingSpinner } from "@/components/ui/loading";
 import Link from "next/link";
 import { ExamRecord, mockExams, mockExamHistory } from "@/lib/mock-data";
 
 export default function HistoryPage() {
   const [examHistory, setExamHistory] = useState<ExamRecord[]>([]);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const router = useRouter();
+
+  // Check authentication status first
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      // User is not logged in, redirect to login
+      router.push("/login");
+    } else {
+      // User is logged in, allow access
+      setIsAuthenticating(false);
+    }
+  }, [router]);
 
   useEffect(() => {
-    // Load exam history from localStorage
-    const history = JSON.parse(localStorage.getItem("examHistory") || "[]");
+    // Only load data if authenticated
+    if (!isAuthenticating) {
+      // Load exam history from localStorage
+      const history = JSON.parse(localStorage.getItem("examHistory") || "[]");
 
-    // Always show mock data, merge with localStorage if exists
-    const combinedHistory = [...mockExamHistory];
+      // Always show mock data, merge with localStorage if exists
+      const combinedHistory = [...mockExamHistory];
 
-    // Add any additional records from localStorage that aren't in mock data
-    history.forEach((record: ExamRecord) => {
-      if (!combinedHistory.find((r) => r.examId === record.examId)) {
-        combinedHistory.push(record);
-      }
-    });
+      // Add any additional records from localStorage that aren't in mock data
+      history.forEach((record: ExamRecord) => {
+        if (!combinedHistory.find((r) => r.examId === record.examId)) {
+          combinedHistory.push(record);
+        }
+      });
 
-    // Sort by date (newest first)
-    combinedHistory.sort(
-      (a, b) =>
-        new Date(b.dateTaken).getTime() - new Date(a.dateTaken).getTime()
+      // Sort by date (newest first)
+      combinedHistory.sort(
+        (a, b) =>
+          new Date(b.dateTaken).getTime() - new Date(a.dateTaken).getTime()
+      );
+
+      setExamHistory(combinedHistory);
+    }
+  }, [isAuthenticating]);
+
+  // Show loading while checking authentication
+  if (isAuthenticating) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
     );
-
-    setExamHistory(combinedHistory);
-  }, []);
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

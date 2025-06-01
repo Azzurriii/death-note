@@ -11,9 +11,34 @@ import {
 import { LoadingCard, LoadingSpinner } from "@/components/ui/loading";
 import { useTests } from "@/hooks/useTests";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
 export default function ExamListPage() {
   const { tests, loading, error, refetch } = useTests();
+  const router = useRouter();
+  const [isAuthenticating, setIsAuthenticating] = React.useState(true);
+
+  // Check authentication status
+  React.useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      // User is not logged in, redirect to login
+      router.push("/login");
+    } else {
+      // User is logged in, allow access
+      setIsAuthenticating(false);
+    }
+  }, [router]);
+
+  // Show loading while checking authentication
+  if (isAuthenticating) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -40,6 +40,34 @@ export interface CreateTestRequest {
   questions: CreateQuestionRequest[];
 }
 
+export interface SubmitAnswerRequest {
+  question_id: number;
+  user_answer: string;
+}
+
+export interface SubmitTestRequest {
+  answers: SubmitAnswerRequest[];
+  user_id: number;
+}
+
+export interface Attempt {
+  id: number;
+  user_id: number;
+  question_id: number;
+  question: Question;
+  user_answer: string;
+  ai_feedback: string;
+  submitted_at: string;
+  created_at: string;
+}
+
+export interface SubmitTestResponse {
+  test_id: number;
+  user_id: number;
+  submitted_count: number;
+  attempts: Attempt[];
+}
+
 export interface ApiResponse<T> {
   data?: T;
   error?: string;

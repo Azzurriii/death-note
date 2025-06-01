@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { useTestDetail } from "@/hooks/useTestDetail";
-import { Question } from "@/types/test";
+import { Question, SubmitTestRequest } from "@/types/test";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import {
@@ -22,6 +22,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { TimerDisplay } from "@/components/timer-display";
 import { WordCountDisplay } from "@/components/word-count-display";
+import { testService } from "@/services/testService";
 
 export default function Part3Page() {
   const params = useParams();
@@ -30,6 +31,7 @@ export default function Part3Page() {
   const { test, loading, error } = useTestDetail(testId);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [timeRemaining, setTimeRemaining] = useState(30 * 60); // 30 minutes
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Timer countdown effect
   useEffect(() => {
@@ -78,31 +80,67 @@ export default function Part3Page() {
     }
   };
 
-  const handleSubmitTest = () => {
-    // Save answer to localStorage for demo purposes
-    localStorage.setItem(`exam-${testId}-part3`, JSON.stringify(answers));
+  const collectAllAnswers = (): SubmitTestRequest => {
+    // Get all answers from localStorage and current state
+    const part1Answers = JSON.parse(
+      localStorage.getItem(`exam-${testId}-part1`) || "{}"
+    );
+    const part2Answers = JSON.parse(
+      localStorage.getItem(`exam-${testId}-part2`) || "{}"
+    );
+    const part3Answers = answers;
 
-    // Create a complete exam record
-    const examRecord = {
-      examId: testId,
-      dateTaken: new Date().toISOString(),
-      part1Answers: JSON.parse(
-        localStorage.getItem(`exam-${testId}-part1`) || "{}"
-      ),
-      part2Answers: JSON.parse(
-        localStorage.getItem(`exam-${testId}-part2`) || "{}"
-      ),
-      part3Answer: answers,
-      completed: true,
+    // Combine all answers
+    const allAnswers = { ...part1Answers, ...part2Answers, ...part3Answers };
+
+    // Convert to API format
+    const submitAnswers = Object.entries(allAnswers).map(
+      ([questionId, userAnswer]) => ({
+        question_id: parseInt(questionId),
+        user_answer: userAnswer as string,
+      })
+    );
+
+    return {
+      answers: submitAnswers,
+      user_id: 0, // Default user ID
     };
+  };
 
-    // Save to exam history
-    const history = JSON.parse(localStorage.getItem("examHistory") || "[]");
-    history.push(examRecord);
-    localStorage.setItem("examHistory", JSON.stringify(history));
+  const handleSubmitTest = async () => {
+    if (isSubmitting) return;
 
-    alert("Test completed successfully! Your answers have been saved.");
-    router.push("/");
+    setIsSubmitting(true);
+
+    try {
+      // Save current Part 3 answers to localStorage
+      localStorage.setItem(`exam-${testId}-part3`, JSON.stringify(answers));
+
+      // Collect all answers from all parts
+      const submitData = collectAllAnswers();
+
+      // Submit to API
+      const result = await testService.submitTest(testId, submitData);
+
+      // Store submission result locally for history page
+      testService.storeSubmissionLocally(testId, 0, result);
+
+      // Clear localStorage for this exam
+      localStorage.removeItem(`exam-${testId}-part1`);
+      localStorage.removeItem(`exam-${testId}-part2`);
+      localStorage.removeItem(`exam-${testId}-part3`);
+
+      // Redirect to history page
+      router.push(`/history/${testId}`);
+    } catch (error) {
+      console.error("Error submitting test:", error);
+      alert(
+        `Failed to submit test: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+      setIsSubmitting(false);
+    }
   };
 
   const handleExit = () => {
@@ -123,7 +161,7 @@ export default function Part3Page() {
             <Progress value={100} className="w-24" />
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" disabled={isSubmitting}>
                   Exit
                 </Button>
               </AlertDialogTrigger>
@@ -196,7 +234,8 @@ export default function Part3Page() {
                   placeholder="Write your essay here..."
                   value={answers[currentQuestion.id] || ""}
                   onChange={(e) => handleAnswerChange(e.target.value)}
-                  className="w-full min-h-[400px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
+                  disabled={isSubmitting}
+                  className="w-full min-h-[400px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none disabled:opacity-50"
                 />
                 <WordCountDisplay text={answers[currentQuestion.id] || ""} />
               </div>
@@ -210,7 +249,9 @@ export default function Part3Page() {
         <div className="max-w-4xl mx-auto text-center">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button size="lg">Submit Test</Button>
+              <Button size="lg" disabled={isSubmitting}>
+                {isSubmitting ? "Submitting Test..." : "Submit Test"}
+              </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -221,9 +262,14 @@ export default function Part3Page() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleSubmitTest}>
-                  Submit Test
+                <AlertDialogCancel disabled={isSubmitting}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleSubmitTest}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Test"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

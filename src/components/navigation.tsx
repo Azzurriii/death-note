@@ -2,14 +2,25 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BookOpen, History, Plus } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { BookOpen, History, Plus, LogOut } from "lucide-react";
 import Image from "next/image";
+import * as React from "react";
 
 export function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [username, setUsername] = React.useState("");
 
-  // Don't show navigation during exam taking
+  // Get username from localStorage
+  React.useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
+
+  // Don't show navigation during exam taking or on login/register pages
   if (
     pathname.includes("/exam/") &&
     (pathname.includes("/part1") ||
@@ -18,6 +29,20 @@ export function Navigation() {
   ) {
     return null;
   }
+
+  // Don't show navigation on auth pages
+  if (pathname === "/login" || pathname === "/register") {
+    return null;
+  }
+
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+
+    // Redirect to login
+    router.push("/login");
+  };
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
@@ -65,6 +90,22 @@ export function Navigation() {
               <span>Add Exam</span>
             </Button>
           </Link>
+
+          {/* User Info and Logout */}
+          <div className="flex items-center space-x-4 border-l border-gray-200 pl-4">
+            {username && (
+              <span className="text-sm text-gray-600">Welcome, {username}</span>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="flex items-center space-x-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </Button>
+          </div>
         </div>
       </div>
     </nav>
