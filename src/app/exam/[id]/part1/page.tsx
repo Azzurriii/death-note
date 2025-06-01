@@ -1,10 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { LoadingSpinner } from "@/components/ui/loading";
+import { TimerDisplay } from "@/components/timer-display";
+import { WordCountDisplay } from "@/components/word-count-display";
+import { useTestDetail } from "@/hooks/useTestDetail";
+import { Question } from "@/types/test";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,45 +22,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { TimerDisplay } from "@/components/timer-display";
-import { WordCountDisplay } from "@/components/word-count-display";
-import Image from "next/image";
-
-// Mock data for Part 1 questions
-const part1Questions = [
-  {
-    id: 1,
-    keywords: "frame, but",
-    imageUrl: "https://picsum.photos/300/200",
-  },
-  {
-    id: 2,
-    keywords: "woman, reading",
-    imageUrl: "https://picsum.photos/300/200",
-  },
-  {
-    id: 3,
-    keywords: "meeting, discuss",
-    imageUrl: "https://picsum.photos/300/200",
-  },
-  {
-    id: 4,
-    keywords: "coffee, while",
-    imageUrl: "https://picsum.photos/300/200",
-  },
-  {
-    id: 5,
-    keywords: "computer, working",
-    imageUrl: "https://picsum.photos/300/200",
-  },
-];
 
 export default function Part1Page() {
-  const router = useRouter();
   const params = useParams();
-  const examId = params.id as string;
-  const [answers, setAnswers] = useState<string[]>(Array(5).fill(""));
-  const [timeRemaining, setTimeRemaining] = useState(8 * 60); // 8 minutes in seconds
+  const router = useRouter();
+  const testId = params.id as string;
+  const { test, loading, error } = useTestDetail(testId);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [timeRemaining, setTimeRemaining] = useState(8 * 60); // 8 minutes
 
   // Timer countdown effect
   useEffect(() => {
@@ -62,7 +37,7 @@ export default function Part1Page() {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           // Auto-proceed to Part 2 when time runs out
-          router.push(`/exam/${examId}/part2`);
+          router.push(`/exam/${testId}/part2`);
           return 0;
         }
         return prev - 1;
@@ -70,18 +45,39 @@ export default function Part1Page() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [examId, router]);
+  }, [testId, router]);
 
-  const handleAnswerChange = (index: number, value: string) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = value;
-    setAnswers(newAnswers);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error || !test) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
+          <p className="text-gray-600">{error || "Test not found"}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const part1Questions = test.questions
+    .filter((q: Question) => q.order_in_test >= 1 && q.order_in_test <= 5)
+    .sort((a, b) => a.order_in_test - b.order_in_test);
+
+  const handleAnswerChange = (questionId: number, answer: string) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
   const handleProceedToPart2 = () => {
     // Save answers to localStorage for demo purposes
-    localStorage.setItem(`exam-${examId}-part1`, JSON.stringify(answers));
-    router.push(`/exam/${examId}/part2`);
+    localStorage.setItem(`exam-${testId}-part1`, JSON.stringify(answers));
+    router.push(`/exam/${testId}/part2`);
   };
 
   const handleExit = () => {
@@ -145,31 +141,51 @@ export default function Part1Page() {
               className="bg-white rounded-lg border border-gray-200 p-6"
             >
               <h3 className="text-lg font-semibold mb-4">
-                Question {question.id}: {question.keywords}
+                Question {question.order_in_test}: {question.title}
               </h3>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <Image
-                    src={question.imageUrl || "/placeholder.svg"}
-                    alt={`Question ${question.id} image`}
-                    width={400}
-                    height={300}
-                    className="rounded-lg border border-gray-200 w-full h-auto"
-                  />
+                  {question.image_url && (
+                    <img
+                      src={question.image_url}
+                      alt={`Question ${question.order_in_test}`}
+                      className="rounded-lg border border-gray-200 w-full h-auto"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "/placeholder-image.jpg";
+                      }}
+                    />
+                  )}
+
+                  <div className="mt-4 bg-yellow-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-yellow-800 mb-2">
+                      Use these words in your sentence:
+                    </p>
+                    <div className="flex gap-2">
+                      <span className="bg-yellow-200 px-2 py-1 rounded text-yellow-800 text-sm font-medium">
+                        {question.given_word1}
+                      </span>
+                      <span className="bg-yellow-200 px-2 py-1 rounded text-yellow-800 text-sm font-medium">
+                        {question.given_word2}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">
                     Type a sentence:
                   </label>
-                  <Textarea
+                  <textarea
                     placeholder="Type your sentence here..."
-                    value={answers[index]}
-                    onChange={(e) => handleAnswerChange(index, e.target.value)}
-                    className="min-h-[120px] resize-none"
+                    value={answers[question.id] || ""}
+                    onChange={(e) =>
+                      handleAnswerChange(question.id, e.target.value)
+                    }
+                    className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   />
-                  <WordCountDisplay text={answers[index]} />
+                  <WordCountDisplay text={answers[question.id] || ""} />
                 </div>
               </div>
             </div>

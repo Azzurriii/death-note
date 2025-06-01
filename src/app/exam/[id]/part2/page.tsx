@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { LoadingSpinner } from "@/components/ui/loading";
+import { TimerDisplay } from "@/components/timer-display";
+import { WordCountDisplay } from "@/components/word-count-display";
+import { useTestDetail } from "@/hooks/useTestDetail";
+import { Question } from "@/types/test";
+import { useState, useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,24 +20,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { TimerDisplay } from "@/components/timer-display";
-import { WordCountDisplay } from "@/components/word-count-display";
-
-// Mock data for Part 2 email prompts
-const part2Prompts = [
-  "You are organizing a company event. Write an email to your colleagues inviting them to the event. Include details about the date, time, location, and what they should bring.",
-  "You received a complaint from a customer about a delayed order. Write a response email apologizing for the delay and explaining how you will resolve the issue.",
-];
 
 export default function Part2Page() {
-  const router = useRouter();
   const params = useParams();
-  const examId = params.id as string;
+  const router = useRouter();
+  const testId = params.id as string;
+  const { test, loading, error } = useTestDetail(testId);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [currentEmail, setCurrentEmail] = useState(0);
-  const [answers, setAnswers] = useState<string[]>(["", ""]);
   const [timeRemaining, setTimeRemaining] = useState(10 * 60); // 10 minutes per email
 
-  // Timer countdown effect
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -45,7 +41,7 @@ export default function Part2Page() {
             return 10 * 60; // Reset timer for next email
           } else {
             // Move to Part 3
-            router.push(`/exam/${examId}/part3`);
+            router.push(`/exam/${testId}/part3`);
             return 0;
           }
         }
@@ -54,12 +50,37 @@ export default function Part2Page() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentEmail, examId, router]);
+  }, [currentEmail, testId, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error || !test) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
+          <p className="text-gray-600">{error || "Test not found"}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const part2Questions = test.questions
+    .filter((q: Question) => q.order_in_test >= 6 && q.order_in_test <= 7)
+    .sort((a, b) => a.order_in_test - b.order_in_test);
+
+  const currentQuestion = part2Questions[currentEmail];
 
   const handleAnswerChange = (value: string) => {
-    const newAnswers = [...answers];
-    newAnswers[currentEmail] = value;
-    setAnswers(newAnswers);
+    if (currentQuestion) {
+      setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
+    }
   };
 
   const handleNextEmail = () => {
@@ -71,8 +92,8 @@ export default function Part2Page() {
 
   const handleProceedToPart3 = () => {
     // Save answers to localStorage for demo purposes
-    localStorage.setItem(`exam-${examId}-part2`, JSON.stringify(answers));
-    router.push(`/exam/${examId}/part3`);
+    localStorage.setItem(`exam-${testId}-part2`, JSON.stringify(answers));
+    router.push(`/exam/${testId}/part3`);
   };
 
   const handleExit = () => {
@@ -127,30 +148,32 @@ export default function Part2Page() {
             <p className="text-gray-600">Email {currentEmail + 1} of 2</p>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold mb-4">
-              Email {currentEmail + 1} Prompt:
-            </h3>
+          {currentQuestion && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold mb-4">
+                {currentQuestion.title}
+              </h3>
 
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-gray-700 leading-relaxed">
-                {part2Prompts[currentEmail]}
-              </p>
-            </div>
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+                  {currentQuestion.prompt}
+                </div>
+              </div>
 
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Your Response:
-              </label>
-              <Textarea
-                placeholder="Type your email response here..."
-                value={answers[currentEmail]}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                className="min-h-[300px] resize-none"
-              />
-              <WordCountDisplay text={answers[currentEmail]} />
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Your Response:
+                </label>
+                <textarea
+                  placeholder="Type your email response here..."
+                  value={answers[currentQuestion.id] || ""}
+                  onChange={(e) => handleAnswerChange(e.target.value)}
+                  className="w-full min-h-[300px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                />
+                <WordCountDisplay text={answers[currentQuestion.id] || ""} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 

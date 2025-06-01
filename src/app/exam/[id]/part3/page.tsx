@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/ui/loading";
+import { useTestDetail } from "@/hooks/useTestDetail";
+import { Question } from "@/types/test";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,18 +19,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Progress } from "@/components/ui/progress";
 import { TimerDisplay } from "@/components/timer-display";
 import { WordCountDisplay } from "@/components/word-count-display";
 
-// Mock data for Part 3 essay prompt
-const part3Prompt =
-  "Some people believe that working from home is more productive than working in an office, while others think that office work is more effective. Which do you prefer and why? Use specific reasons and examples to support your opinion. Write at least 300 words.";
-
 export default function Part3Page() {
-  const router = useRouter();
   const params = useParams();
-  const examId = params.id as string;
-  const [answer, setAnswer] = useState("");
+  const router = useRouter();
+  const testId = params.id as string;
+  const { test, loading, error } = useTestDetail(testId);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [timeRemaining, setTimeRemaining] = useState(30 * 60); // 30 minutes
 
   // Timer countdown effect
@@ -46,25 +47,52 @@ export default function Part3Page() {
     return () => clearInterval(timer);
   }, []);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error || !test) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
+          <p className="text-gray-600">{error || "Test not found"}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const part3Questions = test.questions
+    .filter((q: Question) => q.order_in_test === 8)
+    .sort((a, b) => a.order_in_test - b.order_in_test);
+
+  const currentQuestion = part3Questions[0];
+
   const handleAnswerChange = (value: string) => {
-    setAnswer(value);
+    if (currentQuestion) {
+      setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
+    }
   };
 
   const handleSubmitTest = () => {
     // Save answer to localStorage for demo purposes
-    localStorage.setItem(`exam-${examId}-part3`, JSON.stringify(answer));
+    localStorage.setItem(`exam-${testId}-part3`, JSON.stringify(answers));
 
     // Create a complete exam record
     const examRecord = {
-      examId: examId,
+      examId: testId,
       dateTaken: new Date().toISOString(),
       part1Answers: JSON.parse(
-        localStorage.getItem(`exam-${examId}-part1`) || "[]"
+        localStorage.getItem(`exam-${testId}-part1`) || "{}"
       ),
       part2Answers: JSON.parse(
-        localStorage.getItem(`exam-${examId}-part2`) || "[]"
+        localStorage.getItem(`exam-${testId}-part2`) || "{}"
       ),
-      part3Answer: answer,
+      part3Answer: answers,
       completed: true,
     };
 
@@ -73,7 +101,8 @@ export default function Part3Page() {
     history.push(examRecord);
     localStorage.setItem("examHistory", JSON.stringify(history));
 
-    router.push(`/history/${examId}`);
+    alert("Test completed successfully! Your answers have been saved.");
+    router.push("/");
   };
 
   const handleExit = () => {
@@ -131,26 +160,48 @@ export default function Part3Page() {
             </p>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold mb-4">Essay Prompt:</h3>
+          {currentQuestion && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold mb-4">Essay Prompt:</h3>
 
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-gray-700 leading-relaxed">{part3Prompt}</p>
-            </div>
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+                  {currentQuestion.prompt}
+                </div>
+              </div>
 
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Your Essay:
-              </label>
-              <Textarea
-                placeholder="Write your essay here..."
-                value={answer}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                className="min-h-[400px] resize-none"
-              />
-              <WordCountDisplay text={answer} />
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6">
+                <h4 className="font-medium text-amber-800 mb-2">
+                  Essay Structure Tips:
+                </h4>
+                <ul className="text-sm text-amber-700 space-y-1">
+                  <li>
+                    • <strong>Introduction:</strong> State your opinion clearly
+                  </li>
+                  <li>
+                    • <strong>Body:</strong> Provide 2-3 supporting reasons with
+                    examples
+                  </li>
+                  <li>
+                    • <strong>Conclusion:</strong> Summarize your position
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Your Essay:
+                </label>
+                <textarea
+                  placeholder="Write your essay here..."
+                  value={answers[currentQuestion.id] || ""}
+                  onChange={(e) => handleAnswerChange(e.target.value)}
+                  className="w-full min-h-[400px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
+                />
+                <WordCountDisplay text={answers[currentQuestion.id] || ""} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 
