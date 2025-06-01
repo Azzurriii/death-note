@@ -16,7 +16,15 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 
 export default function ExamListPage() {
-  const [userId, setUserId] = React.useState<number>(0);
+  // Read userId immediately during initialization
+  const [userId, setUserId] = React.useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const storedUserId = localStorage.getItem("userId");
+      return storedUserId ? parseInt(storedUserId, 10) || 0 : 0;
+    }
+    return 0;
+  });
+
   const { tests, loading, error, refetch } = useTests(userId);
   const router = useRouter();
   const [isAuthenticating, setIsAuthenticating] = React.useState(true);
@@ -33,10 +41,18 @@ export default function ExamListPage() {
       router.push("/login");
     } else {
       // User is logged in, allow access
-      setUserId(parseInt(storedUserId, 10) || 0);
+      const parsedUserId = parseInt(storedUserId, 10) || 0;
+      setUserId(parsedUserId);
       setIsAuthenticating(false);
     }
   }, [router]);
+
+  // Simple reload once when component mounts
+  React.useEffect(() => {
+    if (userId > 0) {
+      refetch();
+    }
+  }, [userId]); // Only when userId changes
 
   // Show loading while checking authentication
   if (isAuthenticating) {
