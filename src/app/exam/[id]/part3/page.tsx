@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -23,8 +23,10 @@ import { WordCountDisplay } from "@/components/word-count-display";
 const part3Prompt =
   "Some people believe that working from home is more productive than working in an office, while others think that office work is more effective. Which do you prefer and why? Use specific reasons and examples to support your opinion. Write at least 300 words.";
 
-export default function Part3Page({ params }: { params: { id: string } }) {
+export default function Part3Page() {
   const router = useRouter();
+  const params = useParams();
+  const examId = params.id as string;
   const [answer, setAnswer] = useState("");
   const [timeRemaining, setTimeRemaining] = useState(30 * 60); // 30 minutes
 
@@ -50,17 +52,17 @@ export default function Part3Page({ params }: { params: { id: string } }) {
 
   const handleSubmitTest = () => {
     // Save answer to localStorage for demo purposes
-    localStorage.setItem(`exam-${params.id}-part3`, JSON.stringify(answer));
+    localStorage.setItem(`exam-${examId}-part3`, JSON.stringify(answer));
 
     // Create a complete exam record
     const examRecord = {
-      examId: params.id,
+      examId: examId,
       dateTaken: new Date().toISOString(),
       part1Answers: JSON.parse(
-        localStorage.getItem(`exam-${params.id}-part1`) || "[]"
+        localStorage.getItem(`exam-${examId}-part1`) || "[]"
       ),
       part2Answers: JSON.parse(
-        localStorage.getItem(`exam-${params.id}-part2`) || "[]"
+        localStorage.getItem(`exam-${examId}-part2`) || "[]"
       ),
       part3Answer: answer,
       completed: true,
@@ -71,7 +73,7 @@ export default function Part3Page({ params }: { params: { id: string } }) {
     history.push(examRecord);
     localStorage.setItem("examHistory", JSON.stringify(history));
 
-    router.push(`/history/${params.id}`);
+    router.push(`/history/${examId}`);
   };
 
   const handleExit = () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -49,8 +49,10 @@ const part1Questions = [
   },
 ];
 
-export default function Part1Page({ params }: { params: { id: string } }) {
+export default function Part1Page() {
   const router = useRouter();
+  const params = useParams();
+  const examId = params.id as string;
   const [answers, setAnswers] = useState<string[]>(Array(5).fill(""));
   const [timeRemaining, setTimeRemaining] = useState(8 * 60); // 8 minutes in seconds
 
@@ -60,7 +62,7 @@ export default function Part1Page({ params }: { params: { id: string } }) {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           // Auto-proceed to Part 2 when time runs out
-          router.push(`/exam/${params.id}/part2`);
+          router.push(`/exam/${examId}/part2`);
           return 0;
         }
         return prev - 1;
@@ -68,7 +70,7 @@ export default function Part1Page({ params }: { params: { id: string } }) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [params.id, router]);
+  }, [examId, router]);
 
   const handleAnswerChange = (index: number, value: string) => {
     const newAnswers = [...answers];
@@ -78,8 +80,8 @@ export default function Part1Page({ params }: { params: { id: string } }) {
 
   const handleProceedToPart2 = () => {
     // Save answers to localStorage for demo purposes
-    localStorage.setItem(`exam-${params.id}-part1`, JSON.stringify(answers));
-    router.push(`/exam/${params.id}/part2`);
+    localStorage.setItem(`exam-${examId}-part1`, JSON.stringify(answers));
+    router.push(`/exam/${examId}/part2`);
   };
 
   const handleExit = () => {

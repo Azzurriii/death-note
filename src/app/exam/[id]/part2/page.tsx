@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -25,8 +25,10 @@ const part2Prompts = [
   "You received a complaint from a customer about a delayed order. Write a response email apologizing for the delay and explaining how you will resolve the issue.",
 ];
 
-export default function Part2Page({ params }: { params: { id: string } }) {
+export default function Part2Page() {
   const router = useRouter();
+  const params = useParams();
+  const examId = params.id as string;
   const [currentEmail, setCurrentEmail] = useState(0);
   const [answers, setAnswers] = useState<string[]>(["", ""]);
   const [timeRemaining, setTimeRemaining] = useState(10 * 60); // 10 minutes per email
@@ -43,7 +45,7 @@ export default function Part2Page({ params }: { params: { id: string } }) {
             return 10 * 60; // Reset timer for next email
           } else {
             // Move to Part 3
-            router.push(`/exam/${params.id}/part3`);
+            router.push(`/exam/${examId}/part3`);
             return 0;
           }
         }
@@ -52,7 +54,7 @@ export default function Part2Page({ params }: { params: { id: string } }) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentEmail, params.id, router]);
+  }, [currentEmail, examId, router]);
 
   const handleAnswerChange = (value: string) => {
     const newAnswers = [...answers];
@@ -69,8 +71,8 @@ export default function Part2Page({ params }: { params: { id: string } }) {
 
   const handleProceedToPart3 = () => {
     // Save answers to localStorage for demo purposes
-    localStorage.setItem(`exam-${params.id}-part2`, JSON.stringify(answers));
-    router.push(`/exam/${params.id}/part3`);
+    localStorage.setItem(`exam-${examId}-part2`, JSON.stringify(answers));
+    router.push(`/exam/${examId}/part3`);
   };
 
   const handleExit = () => {
