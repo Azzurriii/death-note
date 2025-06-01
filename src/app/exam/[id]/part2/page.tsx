@@ -91,8 +91,14 @@ export default function Part2Page() {
   };
 
   const handleProceedToPart3 = () => {
-    // Save answers to localStorage for demo purposes
-    localStorage.setItem(`exam-${testId}-part2`, JSON.stringify(answers));
+    // Convert answers to UserAnswerDTO format and save to localStorage
+    const submitAnswers = Object.entries(answers).map(
+      ([questionId, answer]) => ({
+        question_id: parseInt(questionId),
+        user_answer: answer,
+      })
+    );
+    localStorage.setItem(`exam-${testId}-part2`, JSON.stringify(submitAnswers));
     router.push(`/exam/${testId}/part3`);
   };
 

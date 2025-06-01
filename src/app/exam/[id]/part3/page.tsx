@@ -80,26 +80,44 @@ export default function Part3Page() {
         ...prev,
         [currentQuestion.id]: {
           question_id: currentQuestion.id,
-          user_answer: value
-        }
+          user_answer: value,
+        },
       }));
     }
   };
 
   const collectAllAnswers = (): TestAttemptSubmitDTO => {
     // Get answers from localStorage for part 1 and 2
-    const part1Answers = JSON.parse(
+    const part1Data = JSON.parse(
       localStorage.getItem(`exam-${testId}-part1`) || "[]"
     );
-    const part2Answers = JSON.parse(
+    const part2Data = JSON.parse(
       localStorage.getItem(`exam-${testId}-part2`) || "[]"
     );
+
+    // Handle both old format (Record<number, string>) and new format (UserAnswerDTO[])
+    const part1Answers: UserAnswerDTO[] = Array.isArray(part1Data)
+      ? part1Data
+      : Object.entries(part1Data).map(([questionId, answer]) => ({
+          question_id: parseInt(questionId),
+          user_answer: answer as string,
+        }));
+
+    const part2Answers: UserAnswerDTO[] = Array.isArray(part2Data)
+      ? part2Data
+      : Object.entries(part2Data).map(([questionId, answer]) => ({
+          question_id: parseInt(questionId),
+          user_answer: answer as string,
+        }));
+
+    // Convert current part 3 answers
+    const part3Answers: UserAnswerDTO[] = Object.values(answers);
 
     // Combine all answers
     const submitAnswers: UserAnswerDTO[] = [
       ...part1Answers,
       ...part2Answers,
-      ...Object.values(answers)
+      ...part3Answers,
     ];
 
     return {
@@ -208,7 +226,7 @@ export default function Part3Page() {
                 </div>
               </div>
 
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6">
+              <div className="bg-amber-50 rounded-lg border border-amber-200 mb-6">
                 <h4 className="font-medium text-amber-800 mb-2">
                   Essay Structure Tips:
                 </h4>
@@ -237,7 +255,9 @@ export default function Part3Page() {
                   disabled={isSubmitting}
                   className="w-full min-h-[400px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none disabled:opacity-50"
                 />
-                <WordCountDisplay text={answers[currentQuestion.id]?.user_answer || ""} />
+                <WordCountDisplay
+                  text={answers[currentQuestion.id]?.user_answer || ""}
+                />
               </div>
             </div>
           )}
