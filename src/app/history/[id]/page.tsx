@@ -7,6 +7,7 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { useTestSubmission } from "@/hooks/useTestSubmission";
 import { AnswerResponseDTO } from "@/types/test";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 
 export default function ExamDetailPage() {
   const params = useParams();
@@ -133,9 +134,9 @@ export default function ExamDetailPage() {
           AI Feedback:
         </h5>
         <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
-          <p className="whitespace-pre-wrap text-gray-800">
-            {answer.ai_feedback}
-          </p>
+          <div className="text-gray-800 prose prose-sm max-w-none">
+            <ReactMarkdown>{answer.ai_feedback}</ReactMarkdown>
+          </div>
         </div>
         <div className="mt-2 text-right">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -226,30 +227,97 @@ export default function ExamDetailPage() {
             <CardTitle>Test Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-6">
               <div className="bg-blue-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
                   {part1Answers.length}
                 </div>
-                <div className="text-sm text-gray-600">Part 1 Questions</div>
+                <div className="text-sm text-gray-600 mb-1">
+                  Part 1 Questions
+                </div>
+                <div className="text-xs text-gray-500">
+                  {part1Answers.reduce(
+                    (sum, answer) => sum + answer.ai_score,
+                    0
+                  )}{" "}
+                  /{" "}
+                  {part1Answers.reduce(
+                    (sum, answer) => sum + answer.question.max_score,
+                    0
+                  )}{" "}
+                  points
+                </div>
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
                   {part2Answers.length}
                 </div>
-                <div className="text-sm text-gray-600">Part 2 Questions</div>
+                <div className="text-sm text-gray-600 mb-1">
+                  Part 2 Questions
+                </div>
+                <div className="text-xs text-gray-500">
+                  {part2Answers.reduce(
+                    (sum, answer) => sum + answer.ai_score,
+                    0
+                  )}{" "}
+                  /{" "}
+                  {part2Answers.reduce(
+                    (sum, answer) => sum + answer.question.max_score,
+                    0
+                  )}{" "}
+                  points
+                </div>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-purple-600">
                   {part3Answers.length}
                 </div>
-                <div className="text-sm text-gray-600">Part 3 Questions</div>
+                <div className="text-sm text-gray-600 mb-1">
+                  Part 3 Questions
+                </div>
+                <div className="text-xs text-gray-500">
+                  {part3Answers.reduce(
+                    (sum, answer) => sum + answer.ai_score,
+                    0
+                  )}{" "}
+                  /{" "}
+                  {part3Answers.reduce(
+                    (sum, answer) => sum + answer.question.max_score,
+                    0
+                  )}{" "}
+                  points
+                </div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-gray-600">
-                  {submission.total_raw_score} / {submission.scaled_score}
+                  {submission.total_raw_score} / 28
                 </div>
-                <div className="text-sm text-gray-600">Raw / Scaled Score</div>
+                <div className="text-sm text-gray-600 mb-1">
+                  Total Raw Score
+                </div>
+                <div className="text-xs text-gray-500">
+                  API calculated score
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Score Information */}
+            <div className="border-t pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                <div className="bg-indigo-50 p-4 rounded-lg">
+                  <div className="text-lg font-semibold text-indigo-700">
+                    Raw Score: {submission.total_raw_score} / 28
+                  </div>
+                  <div className="text-sm text-gray-600">Total raw points</div>
+                </div>
+                <div className="bg-teal-50 p-4 rounded-lg">
+                  <div className="text-lg font-semibold text-teal-700">
+                    Scaled Score: {submission.scaled_score} / 200
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    TOEIC Writing Scale
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>

@@ -20,6 +20,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Part2Page() {
   const params = useParams();
@@ -111,9 +113,15 @@ export default function Part2Page() {
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900">
-            TOEIC Writing Test
-          </h1>
+          <Link href="/">
+            <Image
+              src="/images/death-note.svg"
+              alt="TOEIC"
+              width={100}
+              height={100}
+              className="w-10 h-10"
+            />
+          </Link>
           <div className="flex items-center space-x-6">
             <TimerDisplay timeRemaining={timeRemaining} label="Part 2" />
             <div className="text-sm text-gray-600">Part 2/3</div>
