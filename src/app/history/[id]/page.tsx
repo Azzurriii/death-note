@@ -6,18 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { useTestSubmission } from "@/hooks/useTestSubmission";
 import { useTestDetail } from "@/hooks/useTestDetail";
-import { Attempt } from "@/types/test";
+import { AnswerResponseDTO, TestAttemptDetailDTO } from "@/types/test";
 import Link from "next/link";
 
 export default function ExamDetailPage() {
   const params = useParams();
   const testId = params.id as string;
   const { test, loading: testLoading } = useTestDetail(testId);
+  // Get the attempt ID from localStorage or from the URL
+  const attemptId = params.id as string;
   const {
     submission,
     loading: submissionLoading,
     error,
-  } = useTestSubmission(testId, 0);
+  } = useTestSubmission(attemptId);
 
   const loading = testLoading || submissionLoading;
 
@@ -55,37 +57,37 @@ export default function ExamDetailPage() {
     });
   };
 
-  // Group attempts by part
-  const sortedAttempts = submission.attempts.sort(
-    (a, b) => a.question.order_in_test - b.question.order_in_test
+  // Group answers by part
+  const sortedAnswers = submission.answers.sort(
+    (a: AnswerResponseDTO, b: AnswerResponseDTO) => a.question.order_in_test - b.question.order_in_test
   );
-  const part1Attempts = sortedAttempts.filter(
-    (a) => a.question.order_in_test >= 1 && a.question.order_in_test <= 5
+  const part1Answers = sortedAnswers.filter(
+    (a: AnswerResponseDTO) => a.question.order_in_test >= 1 && a.question.order_in_test <= 5
   );
-  const part2Attempts = sortedAttempts.filter(
-    (a) => a.question.order_in_test >= 6 && a.question.order_in_test <= 7
+  const part2Answers = sortedAnswers.filter(
+    (a: AnswerResponseDTO) => a.question.order_in_test >= 6 && a.question.order_in_test <= 7
   );
-  const part3Attempts = sortedAttempts.filter(
-    (a) => a.question.order_in_test === 8
+  const part3Answers = sortedAnswers.filter(
+    (a: AnswerResponseDTO) => a.question.order_in_test === 8
   );
 
-  const renderAttempt = (attempt: Attempt) => (
+  const renderAnswer = (answer: AnswerResponseDTO) => (
     <div
-      key={attempt.id}
+      key={answer.id}
       className="border-b border-gray-200 pb-6 last:border-b-0"
     >
       <h4 className="font-semibold mb-3">
-        Question {attempt.question.order_in_test}: {attempt.question.title}
+        Question {answer.question.order_in_test}: {answer.question.title}
       </h4>
 
       {/* Show image for picture questions */}
-      {attempt.question.type === "sentence_picture" && (
+      {answer.question.type === "sentence_picture" && (
         <div className="mb-4">
-          {attempt.question.image_url && (
+          {answer.question.image_url && (
             <div className="mb-3">
               <img
-                src={attempt.question.image_url}
-                alt={`Question ${attempt.question.order_in_test}`}
+                src={answer.question.image_url}
+                alt={`Question ${answer.question.order_in_test}`}
                 className="w-full max-w-md h-48 object-cover rounded-lg border"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
@@ -93,17 +95,17 @@ export default function ExamDetailPage() {
               />
             </div>
           )}
-          {attempt.question.given_word1 && attempt.question.given_word2 && (
+          {answer.question.given_word1 && answer.question.given_word2 && (
             <div className="bg-yellow-50 p-3 rounded-lg mb-3">
               <p className="text-sm font-medium text-yellow-800 mb-1">
                 Required words:
               </p>
               <div className="flex gap-2">
-                <span className="bg-yellow-200 px-2 py-1 rounded text-yellow-800 text-sm">
-                  {attempt.question.given_word1}
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  {answer.question.given_word1}
                 </span>
-                <span className="bg-yellow-200 px-2 py-1 rounded text-yellow-800 text-sm">
-                  {attempt.question.given_word2}
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  {answer.question.given_word2}
                 </span>
               </div>
             </div>
@@ -112,29 +114,38 @@ export default function ExamDetailPage() {
       )}
 
       {/* Show prompt for email and essay questions */}
-      {(attempt.question.type === "email_response" ||
-        attempt.question.type === "opinion_essay") && (
+      {(answer.question.type === "email_response" ||
+        answer.question.type === "opinion_essay") && (
         <div className="mb-4">
           <p className="text-sm font-medium text-gray-700 mb-2">Prompt:</p>
           <div className="text-gray-700 bg-gray-50 p-3 rounded border whitespace-pre-line">
-            {attempt.question.prompt}
+            {answer.question.prompt}
           </div>
         </div>
       )}
 
-      {/* User Answer */}
+      {/* User's answer */}
       <div className="mb-4">
-        <p className="text-sm font-medium text-gray-700 mb-2">Your Answer:</p>
-        <div className="text-gray-900 bg-gray-50 p-3 rounded border whitespace-pre-wrap">
-          {attempt.user_answer || "No answer provided"}
+        <h5 className="text-sm font-semibold text-gray-700 mb-2">Your Answer:</h5>
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <p className="whitespace-pre-wrap">{answer.user_answer}</p>
         </div>
       </div>
 
       {/* AI Feedback */}
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-2">AI Feedback:</p>
-        <div className="bg-blue-50 border-blue-200 border p-3 rounded whitespace-pre-wrap">
-          {attempt.ai_feedback || "No feedback available"}
+        <h5 className="text-sm font-semibold text-gray-700 mb-2">
+          AI Feedback:
+        </h5>
+        <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
+          <p className="whitespace-pre-wrap text-gray-800">
+            {answer.ai_feedback}
+          </p>
+        </div>
+        <div className="mt-2 text-right">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Score: {answer.ai_score} / {answer.question.max_score}
+          </span>
         </div>
       </div>
     </div>
@@ -152,13 +163,13 @@ export default function ExamDetailPage() {
               </h1>
               <p className="text-gray-600">
                 Submitted on{" "}
-                {formatDate(
-                  submission.attempts[0]?.submitted_at ||
-                    new Date().toISOString()
-                )}
+                {formatDate(submission.submitted_at)}
               </p>
               <p className="text-sm text-gray-500">
-                Total Questions Answered: {submission.submitted_count}
+                Total Questions Answered: {submission.answers.length}
+              </p>
+              <p className="text-sm text-gray-500">
+                Status: {submission.status}
               </p>
             </div>
             <Link href="/">
@@ -171,7 +182,7 @@ export default function ExamDetailPage() {
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         {/* Part 1 Results */}
-        {part1Attempts.length > 0 && (
+        {part1Answers.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Part 1: Picture Description (Questions 1-5)</CardTitle>
@@ -180,13 +191,13 @@ export default function ExamDetailPage() {
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
-              {part1Attempts.map(renderAttempt)}
+              {part1Answers.map(renderAnswer)}
             </CardContent>
           </Card>
         )}
 
         {/* Part 2 Results */}
-        {part2Attempts.length > 0 && (
+        {part2Answers.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Part 2: Email Response (Questions 6-7)</CardTitle>
@@ -195,13 +206,13 @@ export default function ExamDetailPage() {
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
-              {part2Attempts.map(renderAttempt)}
+              {part2Answers.map(renderAnswer)}
             </CardContent>
           </Card>
         )}
 
         {/* Part 3 Results */}
-        {part3Attempts.length > 0 && (
+        {part3Answers.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Part 3: Opinion Essay (Question 8)</CardTitle>
@@ -210,7 +221,7 @@ export default function ExamDetailPage() {
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
-              {part3Attempts.map(renderAttempt)}
+              {part3Answers.map(renderAnswer)}
             </CardContent>
           </Card>
         )}
@@ -224,27 +235,27 @@ export default function ExamDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className="bg-blue-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
-                  {part1Attempts.length}
+                  {part1Answers.length}
                 </div>
                 <div className="text-sm text-gray-600">Part 1 Questions</div>
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
-                  {part2Attempts.length}
+                  {part2Answers.length}
                 </div>
                 <div className="text-sm text-gray-600">Part 2 Questions</div>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-purple-600">
-                  {part3Attempts.length}
+                  {part3Answers.length}
                 </div>
                 <div className="text-sm text-gray-600">Part 3 Questions</div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-gray-600">
-                  {submission.submitted_count}
+                  {submission.total_score}
                 </div>
-                <div className="text-sm text-gray-600">Total Submitted</div>
+                <div className="text-sm text-gray-600">Total Score</div>
               </div>
             </div>
           </CardContent>

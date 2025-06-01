@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { Save, ArrowLeft, Loader2 } from "lucide-react";
 import { testService } from "@/services/testService";
-import { CreateTestRequest } from "@/types/test";
+import { TestCreateDTO } from "@/types/test";
 
 export default function AddExamPage() {
   const router = useRouter();
@@ -123,7 +123,7 @@ export default function AddExamPage() {
     setIsLoading(true);
 
     try {
-      const testData: CreateTestRequest = {
+      const testData: TestCreateDTO = {
         title: examTitle,
         description: examDescription,
         questions: [
@@ -134,6 +134,7 @@ export default function AddExamPage() {
               "Write ONE sentence based on the picture using the two words or phrases.",
             type: "sentence_picture" as const,
             order_in_test: index + 1,
+            max_score: 5.0, // Default max score for sentence_picture questions
             image_url: q.imageUrl || undefined,
             given_word1: q.word1,
             given_word2: q.word2,
@@ -144,6 +145,7 @@ export default function AddExamPage() {
             prompt: q.prompt,
             type: "email_response" as const,
             order_in_test: index + 6,
+            max_score: 10.0, // Default max score for email_response questions
           })),
           // Part 3 question (8)
           {
@@ -151,6 +153,7 @@ export default function AddExamPage() {
             prompt: part3Question.prompt,
             type: "opinion_essay" as const,
             order_in_test: 8,
+            max_score: 15.0, // Default max score for opinion_essay question
           },
         ],
       };

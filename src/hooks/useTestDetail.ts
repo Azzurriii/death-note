@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { testService } from "@/services/testService";
-import { TestWithQuestions } from "@/types/test";
+import { TestResponse } from "@/types/test";
 
 interface UseTestDetailResult {
-  test: TestWithQuestions | null;
+  test: TestResponse | null;
   loading: boolean;
   error: string | null;
   refetch: () => void;
 }
 
 export function useTestDetail(testId: string | number): UseTestDetailResult {
-  const [test, setTest] = useState<TestWithQuestions | null>(null);
+  const [test, setTest] = useState<TestResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

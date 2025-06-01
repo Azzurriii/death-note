@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
 import { testService } from "@/services/testService";
-import { SubmitTestResponse } from "@/types/test";
+import { TestAttemptDetailDTO } from "@/types/test";
 
 interface UseTestSubmissionResult {
-  submission: SubmitTestResponse | null;
+  submission: TestAttemptDetailDTO | null;
   loading: boolean;
   error: string | null;
   refetch: () => void;
 }
 
 export function useTestSubmission(
-  testId: string | number,
-  userId: number = 0
+  attemptId: string | number
 ): UseTestSubmissionResult {
-  const [submission, setSubmission] = useState<SubmitTestResponse | null>(null);
+  const [submission, setSubmission] = useState<TestAttemptDetailDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +20,7 @@ export function useTestSubmission(
     try {
       setLoading(true);
       setError(null);
-      const data = await testService.getTestSubmission(testId, userId);
+      const data = await testService.getTestAttempt(attemptId);
       setSubmission(data);
     } catch (err) {
       setError(
@@ -33,10 +32,10 @@ export function useTestSubmission(
   };
 
   useEffect(() => {
-    if (testId) {
+    if (attemptId) {
       fetchSubmission();
     }
-  }, [testId, userId]);
+  }, [attemptId]);
 
   return {
     submission,

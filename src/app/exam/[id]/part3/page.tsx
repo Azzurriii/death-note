@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { useTestDetail } from "@/hooks/useTestDetail";
-import { Question, SubmitTestRequest } from "@/types/test";
+import { Question, TestAttemptSubmitDTO, UserAnswerDTO } from "@/types/test";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import {
@@ -29,7 +29,7 @@ export default function Part3Page() {
   const router = useRouter();
   const testId = params.id as string;
   const { test, loading, error } = useTestDetail(testId);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<Record<number, UserAnswerDTO>>({});
   const [timeRemaining, setTimeRemaining] = useState(30 * 60); // 30 minutes
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -76,34 +76,34 @@ export default function Part3Page() {
 
   const handleAnswerChange = (value: string) => {
     if (currentQuestion) {
-      setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
+      setAnswers((prev) => ({
+        ...prev,
+        [currentQuestion.id]: {
+          question_id: currentQuestion.id,
+          user_answer: value
+        }
+      }));
     }
   };
 
-  const collectAllAnswers = (): SubmitTestRequest => {
-    // Get all answers from localStorage and current state
+  const collectAllAnswers = (): TestAttemptSubmitDTO => {
+    // Get answers from localStorage for part 1 and 2
     const part1Answers = JSON.parse(
-      localStorage.getItem(`exam-${testId}-part1`) || "{}"
+      localStorage.getItem(`exam-${testId}-part1`) || "[]"
     );
     const part2Answers = JSON.parse(
-      localStorage.getItem(`exam-${testId}-part2`) || "{}"
+      localStorage.getItem(`exam-${testId}-part2`) || "[]"
     );
-    const part3Answers = answers;
 
     // Combine all answers
-    const allAnswers = { ...part1Answers, ...part2Answers, ...part3Answers };
-
-    // Convert to API format
-    const submitAnswers = Object.entries(allAnswers).map(
-      ([questionId, userAnswer]) => ({
-        question_id: parseInt(questionId),
-        user_answer: userAnswer as string,
-      })
-    );
+    const submitAnswers: UserAnswerDTO[] = [
+      ...part1Answers,
+      ...part2Answers,
+      ...Object.values(answers)
+    ];
 
     return {
       answers: submitAnswers,
-      user_id: 0, // Default user ID
     };
   };
 
@@ -122,8 +122,8 @@ export default function Part3Page() {
       // Submit to API
       const result = await testService.submitTest(testId, submitData);
 
-      // Store submission result locally for history page
-      testService.storeSubmissionLocally(testId, 0, result);
+      // Store attempt ID locally for history page
+      testService.storeAttemptIdLocally(testId, 0, result.id);
 
       // Clear localStorage for this exam
       localStorage.removeItem(`exam-${testId}-part1`);
@@ -232,12 +232,12 @@ export default function Part3Page() {
                 </label>
                 <textarea
                   placeholder="Write your essay here..."
-                  value={answers[currentQuestion.id] || ""}
+                  value={answers[currentQuestion.id]?.user_answer || ""}
                   onChange={(e) => handleAnswerChange(e.target.value)}
                   disabled={isSubmitting}
                   className="w-full min-h-[400px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none disabled:opacity-50"
                 />
-                <WordCountDisplay text={answers[currentQuestion.id] || ""} />
+                <WordCountDisplay text={answers[currentQuestion.id]?.user_answer || ""} />
               </div>
             </div>
           )}

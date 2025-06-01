@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { testService } from "@/services/testService";
-import { Test } from "@/types/test";
+import { TestSummary } from "@/types/test";
 
 interface UseTestsResult {
-  tests: Test[];
+  tests: TestSummary[];
   loading: boolean;
   error: string | null;
   refetch: () => void;
 }
 
 export function useTests(): UseTestsResult {
-  const [tests, setTests] = useState<Test[]>([]);
+  const [tests, setTests] = useState<TestSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +18,7 @@ export function useTests(): UseTestsResult {
     try {
       setLoading(true);
       setError(null);
-      const data = await testService.getAllTests(false);
+      const data = await testService.getAllTests();
       setTests(data);
     } catch (err) {
       setError(
