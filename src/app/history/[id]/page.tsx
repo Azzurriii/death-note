@@ -5,23 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { useTestSubmission } from "@/hooks/useTestSubmission";
-import { useTestDetail } from "@/hooks/useTestDetail";
-import { AnswerResponseDTO, TestAttemptDetailDTO } from "@/types/test";
+import { AnswerResponseDTO } from "@/types/test";
 import Link from "next/link";
 
 export default function ExamDetailPage() {
   const params = useParams();
-  const testId = params.id as string;
-  const { test, loading: testLoading } = useTestDetail(testId);
-  // Get the attempt ID from localStorage or from the URL
   const attemptId = params.id as string;
-  const {
-    submission,
-    loading: submissionLoading,
-    error,
-  } = useTestSubmission(attemptId);
-
-  const loading = testLoading || submissionLoading;
+  const { submission, loading, error } = useTestSubmission(attemptId);
 
   if (loading) {
     return (
@@ -31,13 +21,13 @@ export default function ExamDetailPage() {
     );
   }
 
-  if (error || !submission || !test) {
+  if (error || !submission) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
           <p className="text-gray-500 text-lg mb-4">
-            {error || "No submission found for this test."}
+            {error || "No submission found for this attempt."}
           </p>
           <Link href="/">
             <Button>Back to Home</Button>
@@ -59,13 +49,16 @@ export default function ExamDetailPage() {
 
   // Group answers by part
   const sortedAnswers = submission.answers.sort(
-    (a: AnswerResponseDTO, b: AnswerResponseDTO) => a.question.order_in_test - b.question.order_in_test
+    (a: AnswerResponseDTO, b: AnswerResponseDTO) =>
+      a.question.order_in_test - b.question.order_in_test
   );
   const part1Answers = sortedAnswers.filter(
-    (a: AnswerResponseDTO) => a.question.order_in_test >= 1 && a.question.order_in_test <= 5
+    (a: AnswerResponseDTO) =>
+      a.question.order_in_test >= 1 && a.question.order_in_test <= 5
   );
   const part2Answers = sortedAnswers.filter(
-    (a: AnswerResponseDTO) => a.question.order_in_test >= 6 && a.question.order_in_test <= 7
+    (a: AnswerResponseDTO) =>
+      a.question.order_in_test >= 6 && a.question.order_in_test <= 7
   );
   const part3Answers = sortedAnswers.filter(
     (a: AnswerResponseDTO) => a.question.order_in_test === 8
@@ -126,7 +119,9 @@ export default function ExamDetailPage() {
 
       {/* User's answer */}
       <div className="mb-4">
-        <h5 className="text-sm font-semibold text-gray-700 mb-2">Your Answer:</h5>
+        <h5 className="text-sm font-semibold text-gray-700 mb-2">
+          Your Answer:
+        </h5>
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <p className="whitespace-pre-wrap">{answer.user_answer}</p>
         </div>
@@ -159,11 +154,10 @@ export default function ExamDetailPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Test Results: {test.title}
+                Test Results: {submission.test_title}
               </h1>
               <p className="text-gray-600">
-                Submitted on{" "}
-                {formatDate(submission.submitted_at)}
+                Submitted on {formatDate(submission.submitted_at)}
               </p>
               <p className="text-sm text-gray-500">
                 Total Questions Answered: {submission.answers.length}
@@ -253,9 +247,9 @@ export default function ExamDetailPage() {
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-gray-600">
-                  {submission.total_score}
+                  {submission.total_raw_score} / {submission.scaled_score}
                 </div>
-                <div className="text-sm text-gray-600">Total Score</div>
+                <div className="text-sm text-gray-600">Raw / Scaled Score</div>
               </div>
             </div>
           </CardContent>

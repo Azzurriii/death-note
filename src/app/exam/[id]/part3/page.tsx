@@ -38,7 +38,6 @@ export default function Part3Page() {
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          // Auto-submit when time runs out
           handleSubmitTest();
           return 0;
         }
@@ -131,25 +130,32 @@ export default function Part3Page() {
     setIsSubmitting(true);
 
     try {
+      // Get userId from localStorage
+      const storedUserId = localStorage.getItem("userId");
+      const userId = storedUserId ? parseInt(storedUserId, 10) : 0;
+
       // Save current Part 3 answers to localStorage
       localStorage.setItem(`exam-${testId}-part3`, JSON.stringify(answers));
 
       // Collect all answers from all parts
       const submitData = collectAllAnswers();
 
+      // Add user_id to submit data
+      submitData.user_id = userId;
+
       // Submit to API
       const result = await testService.submitTest(testId, submitData);
 
-      // Store attempt ID locally for history page
-      testService.storeAttemptIdLocally(testId, 0, result.id);
+      // Store attempt ID locally for history page with correct userId
+      testService.storeAttemptIdLocally(testId, userId, result.id);
 
       // Clear localStorage for this exam
       localStorage.removeItem(`exam-${testId}-part1`);
       localStorage.removeItem(`exam-${testId}-part2`);
       localStorage.removeItem(`exam-${testId}-part3`);
 
-      // Redirect to history page
-      router.push(`/history/${testId}`);
+      // Redirect to history page with attempt ID
+      router.push(`/history/${result.id}`);
     } catch (error) {
       console.error("Error submitting test:", error);
       alert(

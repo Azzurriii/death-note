@@ -4,6 +4,10 @@ export interface TestSummary {
   description: string;
   created_at: string;
   question_count: number;
+  has_attempted_by_user: boolean;
+  last_attempt_status?: string;
+  last_attempt_raw_score?: number;
+  last_attempt_scaled_score?: number;
 }
 
 export interface Question {
@@ -70,7 +74,8 @@ export interface TestAttemptDetailDTO {
   user_id: number;
   submitted_at: string;
   status: string;
-  total_score: number;
+  total_raw_score: number;
+  scaled_score: number;
   answers: AnswerResponseDTO[];
 }
 
@@ -86,7 +91,8 @@ export interface TestAttemptSummaryDTO {
   user_id: number;
   submitted_at: string;
   status: string;
-  total_score: number;
+  total_raw_score: number;
+  scaled_score: number;
 }
 
 export interface ErrorResponse {

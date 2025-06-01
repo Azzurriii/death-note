@@ -9,7 +9,7 @@ interface UseTestsResult {
   refetch: () => void;
 }
 
-export function useTests(): UseTestsResult {
+export function useTests(userId: number = 0): UseTestsResult {
   const [tests, setTests] = useState<TestSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ export function useTests(): UseTestsResult {
     try {
       setLoading(true);
       setError(null);
-      const data = await testService.getAllTests();
+      const data = await testService.getAllTests(userId);
       setTests(data);
     } catch (err) {
       setError(
@@ -31,7 +31,7 @@ export function useTests(): UseTestsResult {
 
   useEffect(() => {
     fetchTests();
-  }, []);
+  }, [userId]);
 
   return {
     tests,

@@ -9,8 +9,8 @@ import {
 } from "@/types/test";
 
 export const testService = {
-  async getAllTests(): Promise<TestSummary[]> {
-    const endpoint = `/tests`;
+  async getAllTests(userId: number = 0): Promise<TestSummary[]> {
+    const endpoint = `/tests?user_id=${userId}`;
     return apiRequest<TestSummary[]>(endpoint);
   },
 
@@ -38,11 +38,13 @@ export const testService = {
     });
   },
 
-  async getTestAttempt(attemptId: string | number): Promise<TestAttemptDetailDTO> {
+  async getTestAttempt(
+    attemptId: string | number
+  ): Promise<TestAttemptDetailDTO> {
     const endpoint = `/test-attempts/${attemptId}`;
     return apiRequest<TestAttemptDetailDTO>(endpoint);
   },
-  
+
   async getUserTestAttempts(
     testId: string | number,
     userId?: number
@@ -60,12 +62,9 @@ export const testService = {
     userId: number,
     attemptId: number
   ): void {
-    localStorage.setItem(
-      `attempt-${testId}-${userId}`,
-      attemptId.toString()
-    );
+    localStorage.setItem(`attempt-${testId}-${userId}`, attemptId.toString());
   },
-  
+
   // Helper method to get stored attempt ID
   getStoredAttemptId(
     testId: string | number,

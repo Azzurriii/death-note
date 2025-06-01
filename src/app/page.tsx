@@ -9,24 +9,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoadingCard, LoadingSpinner } from "@/components/ui/loading";
+import { TestAttemptsModal } from "@/components/ui/test-attempts-modal";
 import { useTests } from "@/hooks/useTests";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
 export default function ExamListPage() {
-  const { tests, loading, error, refetch } = useTests();
+  const [userId, setUserId] = React.useState<number>(0);
+  const { tests, loading, error, refetch } = useTests(userId);
   const router = useRouter();
   const [isAuthenticating, setIsAuthenticating] = React.useState(true);
+  const [selectedTest, setSelectedTest] = React.useState<{
+    id: number;
+    title: string;
+  } | null>(null);
 
   // Check authentication status
   React.useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    const storedUserId = localStorage.getItem("userId");
+    if (!storedUserId) {
       // User is not logged in, redirect to login
       router.push("/login");
     } else {
       // User is logged in, allow access
+      setUserId(parseInt(storedUserId, 10) || 0);
       setIsAuthenticating(false);
     }
   }, [router]);
@@ -94,6 +101,14 @@ export default function ExamListPage() {
     );
   }
 
+  const handleShowAttempts = (testId: number, testTitle: string) => {
+    setSelectedTest({ id: testId, title: testTitle });
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTest(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-6 py-8">
@@ -124,19 +139,66 @@ export default function ExamListPage() {
                   <CardDescription className="text-sm">
                     {test.description}
                   </CardDescription>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-xs text-gray-500">
+                      Questions: {test.question_count}
+                    </p>
+                    {test.has_attempted_by_user && test.last_attempt_status && (
+                      <>
+                        <p className="text-xs text-gray-500">
+                          Last Status:
+                          <span
+                            className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                              test.last_attempt_status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {test.last_attempt_status}
+                          </span>
+                        </p>
+                        {test.last_attempt_raw_score !== undefined && (
+                          <p className="text-xs text-gray-500">
+                            Last Score: {test.last_attempt_raw_score} (Scaled:{" "}
+                            {test.last_attempt_scaled_score})
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardContent className="pt-0 space-y-2">
                   <Link href={`/exam/${test.id}/part1`} className="block">
                     <Button className="w-full bg-black hover:bg-gray-800 text-white">
                       Start Exam
                     </Button>
                   </Link>
+                  {test.has_attempted_by_user && (
+                    <Button
+                      onClick={() => handleShowAttempts(test.id, test.title)}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      See Attempts
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
       </main>
+
+      {/* Test Attempts Modal */}
+      {selectedTest && (
+        <TestAttemptsModal
+          isOpen={!!selectedTest}
+          onClose={handleCloseModal}
+          testId={selectedTest.id}
+          testTitle={selectedTest.title}
+          userId={userId}
+        />
+      )}
     </div>
   );
 }

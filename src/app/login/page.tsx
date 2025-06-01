@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
+import { users } from "@/store/users";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -25,13 +26,17 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simple temporary login logic
     if (username && password) {
-      // Generate a simple user ID or use the username
-      const userId = `user_${username}_${Date.now()}`;
+      const userId = users.find(
+        (user) => user.username === username && user.password === password
+      )?.id;
+      if (!userId) {
+        setIsLoading(false);
+        alert("Invalid username or password");
+        return;
+      }
 
-      // Save user ID to localStorage
-      localStorage.setItem("userId", userId);
+      localStorage.setItem("userId", userId.toString());
       localStorage.setItem("username", username);
 
       setTimeout(() => {
