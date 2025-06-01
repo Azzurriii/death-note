@@ -1,9 +1,9 @@
-export interface Test {
+export interface TestSummary {
   id: number;
   title: string;
   description: string;
   created_at: string;
-  updated_at: string;
+  question_count: number;
 }
 
 export interface Question {
@@ -13,63 +13,83 @@ export interface Question {
   prompt: string;
   type: "sentence_picture" | "email_response" | "opinion_essay";
   order_in_test: number;
+  max_score: number;
   image_url?: string;
   given_word1?: string;
   given_word2?: string;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface TestWithQuestions extends Test {
+export interface TestResponse {
+  id: number;
+  title: string;
+  description: string;
+  created_at: string;
   questions: Question[];
 }
 
-export interface CreateQuestionRequest {
+export interface QuestionCreateDTO {
   title: string;
   prompt: string;
   type: "sentence_picture" | "email_response" | "opinion_essay";
   order_in_test: number;
+  max_score: number;
   image_url?: string;
   given_word1?: string;
   given_word2?: string;
 }
 
-export interface CreateTestRequest {
+export interface TestCreateDTO {
   title: string;
   description: string;
-  questions: CreateQuestionRequest[];
+  questions: QuestionCreateDTO[];
 }
 
-export interface SubmitAnswerRequest {
+export interface UserAnswerDTO {
   question_id: number;
   user_answer: string;
 }
 
-export interface SubmitTestRequest {
-  answers: SubmitAnswerRequest[];
-  user_id: number;
+export interface TestAttemptSubmitDTO {
+  answers: UserAnswerDTO[];
+  user_id?: number;
 }
 
-export interface Attempt {
+export interface AnswerResponseDTO {
   id: number;
-  user_id: number;
   question_id: number;
   question: Question;
   user_answer: string;
+  ai_score: number;
   ai_feedback: string;
-  submitted_at: string;
-  created_at: string;
 }
 
-export interface SubmitTestResponse {
+export interface TestAttemptDetailDTO {
+  id: number;
   test_id: number;
+  test_title: string;
   user_id: number;
-  submitted_count: number;
-  attempts: Attempt[];
+  submitted_at: string;
+  status: string;
+  total_score: number;
+  answers: AnswerResponseDTO[];
 }
 
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
   loading?: boolean;
+}
+
+export interface TestAttemptSummaryDTO {
+  id: number;
+  test_id: number;
+  user_id: number;
+  submitted_at: string;
+  status: string;
+  total_score: number;
+}
+
+export interface ErrorResponse {
+  message: string;
+  details?: string[];
 }

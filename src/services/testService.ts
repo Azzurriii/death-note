@@ -1,26 +1,27 @@
 import { apiRequest } from "@/lib/api";
 import {
-  Test,
-  TestWithQuestions,
-  CreateTestRequest,
-  SubmitTestRequest,
-  SubmitTestResponse,
+  TestSummary,
+  TestResponse,
+  TestCreateDTO,
+  TestAttemptSubmitDTO,
+  TestAttemptDetailDTO,
+  TestAttemptSummaryDTO,
 } from "@/types/test";
 
 export const testService = {
-  async getAllTests(withQuestions: boolean = false): Promise<Test[]> {
-    const endpoint = `/tests?with_questions=${withQuestions}`;
-    return apiRequest<Test[]>(endpoint);
-  },
-
-  async getTestWithQuestions(id: string | number): Promise<TestWithQuestions> {
-    const endpoint = `/tests/${id}`;
-    return apiRequest<TestWithQuestions>(endpoint);
-  },
-
-  async createTest(testData: CreateTestRequest): Promise<TestWithQuestions> {
+  async getAllTests(): Promise<TestSummary[]> {
     const endpoint = `/tests`;
-    return apiRequest<TestWithQuestions>(endpoint, {
+    return apiRequest<TestSummary[]>(endpoint);
+  },
+
+  async getTestWithQuestions(id: string | number): Promise<TestResponse> {
+    const endpoint = `/tests/${id}`;
+    return apiRequest<TestResponse>(endpoint);
+  },
+
+  async createTest(testData: TestCreateDTO): Promise<TestResponse> {
+    const endpoint = `/admin/tests`;
+    return apiRequest<TestResponse>(endpoint, {
       method: "POST",
       body: JSON.stringify(testData),
     });
@@ -28,38 +29,49 @@ export const testService = {
 
   async submitTest(
     testId: string | number,
-    submitData: SubmitTestRequest
-  ): Promise<SubmitTestResponse> {
-    const endpoint = `/tests/${testId}/submit`;
-    return apiRequest<SubmitTestResponse>(endpoint, {
+    submitData: TestAttemptSubmitDTO
+  ): Promise<TestAttemptDetailDTO> {
+    const endpoint = `/tests/${testId}/attempts`;
+    return apiRequest<TestAttemptDetailDTO>(endpoint, {
       method: "POST",
       body: JSON.stringify(submitData),
     });
   },
 
-  async getTestSubmission(
+  async getTestAttempt(attemptId: string | number): Promise<TestAttemptDetailDTO> {
+    const endpoint = `/test-attempts/${attemptId}`;
+    return apiRequest<TestAttemptDetailDTO>(endpoint);
+  },
+  
+  async getUserTestAttempts(
     testId: string | number,
-    userId: number = 0
-  ): Promise<SubmitTestResponse> {
-    // Try to get from localStorage first (for demo purposes)
-    const stored = localStorage.getItem(`submission-${testId}-${userId}`);
-    if (stored) {
-      return JSON.parse(stored);
+    userId?: number
+  ): Promise<TestAttemptSummaryDTO[]> {
+    let endpoint = `/tests/${testId}/my-attempts`;
+    if (userId !== undefined) {
+      endpoint += `?user_id=${userId}`;
     }
-
-    // If not found, throw error to indicate no submission exists
-    throw new Error("No submission found for this test");
+    return apiRequest<TestAttemptSummaryDTO[]>(endpoint);
   },
 
-  // Helper method to store submission locally (will be called after successful submit)
-  storeSubmissionLocally(
+  // Helper method to store attempt ID locally (for demo purposes)
+  storeAttemptIdLocally(
     testId: string | number,
     userId: number,
-    submission: SubmitTestResponse
+    attemptId: number
   ): void {
     localStorage.setItem(
-      `submission-${testId}-${userId}`,
-      JSON.stringify(submission)
+      `attempt-${testId}-${userId}`,
+      attemptId.toString()
     );
+  },
+  
+  // Helper method to get stored attempt ID
+  getStoredAttemptId(
+    testId: string | number,
+    userId: number = 0
+  ): number | null {
+    const stored = localStorage.getItem(`attempt-${testId}-${userId}`);
+    return stored ? parseInt(stored, 10) : null;
   },
 };
