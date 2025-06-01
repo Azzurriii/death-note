@@ -8,24 +8,44 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Upload, X, ImageIcon, Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, Loader2 } from "lucide-react";
+import { testService } from "@/services/testService";
+import { CreateTestRequest } from "@/types/test";
 
 export default function AddExamPage() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [examTitle, setExamTitle] = useState("");
+  const [examDescription, setExamDescription] = useState("");
+
   const [part1Questions, setPart1Questions] = useState<
-    Array<{ keywords: string; imageFile: File | null; imagePreview: string }>
+    Array<{ title: string; imageUrl: string; word1: string; word2: string }>
   >(
     Array(5)
       .fill(null)
-      .map(() => ({ keywords: "", imageFile: null, imagePreview: "" }))
+      .map((_, index) => ({
+        title: `Task 1 - Question ${index + 1}`,
+        imageUrl: "",
+        word1: "",
+        word2: "",
+      }))
   );
-  const [part2Prompts, setPart2Prompts] = useState(["", ""]);
-  const [part3Prompt, setPart3Prompt] = useState("");
+
+  const [part2Questions, setPart2Questions] = useState<
+    Array<{ title: string; prompt: string }>
+  >([
+    { title: "Task 2 - Question 6: Respond to an Email", prompt: "" },
+    { title: "Task 2 - Question 7: Respond to an Email", prompt: "" },
+  ]);
+
+  const [part3Question, setPart3Question] = useState({
+    title: "Task 3 - Question 8: Opinion Essay",
+    prompt: "",
+  });
 
   const handlePart1Change = (
     index: number,
-    field: "keywords",
+    field: "title" | "imageUrl" | "word1" | "word2",
     value: string
   ) => {
     const newQuestions = [...part1Questions];
@@ -33,57 +53,98 @@ export default function AddExamPage() {
     setPart1Questions(newQuestions);
   };
 
-  const handleImageUpload = (index: number, file: File) => {
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const newQuestions = [...part1Questions];
-        newQuestions[index].imageFile = file;
-        newQuestions[index].imagePreview = e.target?.result as string;
-        setPart1Questions(newQuestions);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handlePart2Change = (
+    index: number,
+    field: "title" | "prompt",
+    value: string
+  ) => {
+    const newQuestions = [...part2Questions];
+    newQuestions[index][field] = value;
+    setPart2Questions(newQuestions);
   };
 
-  const removeImage = (index: number) => {
-    const newQuestions = [...part1Questions];
-    newQuestions[index].imageFile = null;
-    newQuestions[index].imagePreview = "";
-    setPart1Questions(newQuestions);
-  };
-
-  const handlePart2Change = (index: number, value: string) => {
-    const newPrompts = [...part2Prompts];
-    newPrompts[index] = value;
-    setPart2Prompts(newPrompts);
-  };
-
-  const handleSaveExam = () => {
+  const handleSaveExam = async () => {
     if (!examTitle.trim()) {
       alert("Please enter an exam title");
       return;
     }
 
-    // Convert files to base64 for storage (in a real app, upload to cloud storage)
-    const examData = {
-      id: Date.now().toString(),
-      title: examTitle,
-      part1Questions: part1Questions.map((q) => ({
-        keywords: q.keywords,
-        imageData: q.imagePreview, // Store base64 data
-      })),
-      part2Prompts,
-      part3Prompt,
-      created: new Date().toISOString(),
-    };
+    if (!examDescription.trim()) {
+      alert("Please enter an exam description");
+      return;
+    }
 
-    const exams = JSON.parse(localStorage.getItem("customExams") || "[]");
-    exams.push(examData);
-    localStorage.setItem("customExams", JSON.stringify(exams));
+    // Validate Part 1 questions
+    for (let i = 0; i < part1Questions.length; i++) {
+      const q = part1Questions[i];
+      if (!q.word1 || !q.word2) {
+        alert(`Please enter both words for Question ${i + 1}`);
+        return;
+      }
+    }
 
-    alert("Exam saved successfully!");
-    router.push("/");
+    // Validate Part 2 questions
+    for (let i = 0; i < part2Questions.length; i++) {
+      if (!part2Questions[i].prompt.trim()) {
+        alert(`Please enter prompt for Email ${i + 1}`);
+        return;
+      }
+    }
+
+    // Validate Part 3 question
+    if (!part3Question.prompt.trim()) {
+      alert("Please enter the essay prompt");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const testData: CreateTestRequest = {
+        title: examTitle,
+        description: examDescription,
+        questions: [
+          // Part 1 questions (1-5)
+          ...part1Questions.map((q, index) => ({
+            title: q.title,
+            prompt:
+              "Write ONE sentence based on the picture using the two words or phrases.",
+            type: "sentence_picture" as const,
+            order_in_test: index + 1,
+            image_url: q.imageUrl || undefined,
+            given_word1: q.word1,
+            given_word2: q.word2,
+          })),
+          // Part 2 questions (6-7)
+          ...part2Questions.map((q, index) => ({
+            title: q.title,
+            prompt: q.prompt,
+            type: "email_response" as const,
+            order_in_test: index + 6,
+          })),
+          // Part 3 question (8)
+          {
+            title: part3Question.title,
+            prompt: part3Question.prompt,
+            type: "opinion_essay" as const,
+            order_in_test: 8,
+          },
+        ],
+      };
+
+      const result = await testService.createTest(testData);
+      alert(`Exam "${result.title}" created successfully!`);
+      router.push("/");
+    } catch (error) {
+      console.error("Error creating exam:", error);
+      alert(
+        `Failed to create exam: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -97,6 +158,7 @@ export default function AddExamPage() {
               size="sm"
               onClick={() => router.back()}
               className="gap-2"
+              disabled={isLoading}
             >
               <ArrowLeft className="w-4 h-4" />
               Back
@@ -106,7 +168,7 @@ export default function AddExamPage() {
                 Create New Exam
               </h1>
               <p className="text-sm text-gray-600">
-                Design a custom exam with multiple parts
+                Design a custom TOEIC Writing exam
               </p>
             </div>
           </div>
@@ -134,17 +196,34 @@ export default function AddExamPage() {
                 1. Basic Information
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="examTitle" className="text-sm font-medium">
                   Exam Title *
                 </Label>
                 <Input
                   id="examTitle"
-                  placeholder="e.g., IELTS Practice Test - Academic Module"
+                  placeholder="e.g., TOEIC Writing Practice Test 001"
                   value={examTitle}
                   onChange={(e) => setExamTitle(e.target.value)}
                   className="h-11"
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="examDescription"
+                  className="text-sm font-medium"
+                >
+                  Description *
+                </Label>
+                <Textarea
+                  id="examDescription"
+                  placeholder="e.g., A complete TOEIC Writing practice test covering all tasks."
+                  value={examDescription}
+                  onChange={(e) => setExamDescription(e.target.value)}
+                  className="min-h-[80px]"
+                  disabled={isLoading}
                 />
               </div>
             </CardContent>
@@ -154,10 +233,10 @@ export default function AddExamPage() {
           <Card className="shadow-sm border-0 bg-white/70 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
-                2. Part 1: Image Description Questions
+                2. Part 1: Picture Description Questions (1-5)
               </CardTitle>
               <p className="text-sm text-gray-600">
-                Create 5 questions with keywords and images for students to
+                Create 5 questions with keywords and image URLs for students to
                 describe
               </p>
             </CardHeader>
@@ -180,64 +259,94 @@ export default function AddExamPage() {
                     <div className="space-y-4">
                       <div>
                         <Label
-                          htmlFor={`q${index + 1}-keywords`}
+                          htmlFor={`q${index + 1}-title`}
                           className="text-sm font-medium"
                         >
-                          Keywords
+                          Question Title
                         </Label>
                         <Input
-                          id={`q${index + 1}-keywords`}
-                          placeholder="e.g., frame, but, however"
-                          value={question.keywords}
+                          id={`q${index + 1}-title`}
+                          placeholder={`Task 1 - Question ${
+                            index + 1
+                          }: Scene Description`}
+                          value={question.title}
                           onChange={(e) =>
-                            handlePart1Change(index, "keywords", e.target.value)
+                            handlePart1Change(index, "title", e.target.value)
                           }
                           className="mt-1"
+                          disabled={isLoading}
                         />
                       </div>
 
                       <div>
-                        <Label className="text-sm font-medium">Image</Label>
-                        {question.imagePreview ? (
-                          <div className="mt-2 relative">
+                        <Label
+                          htmlFor={`q${index + 1}-imageUrl`}
+                          className="text-sm font-medium"
+                        >
+                          Image URL
+                        </Label>
+                        <Input
+                          id={`q${index + 1}-imageUrl`}
+                          placeholder="https://example.com/image.jpg"
+                          value={question.imageUrl}
+                          onChange={(e) =>
+                            handlePart1Change(index, "imageUrl", e.target.value)
+                          }
+                          className="mt-1"
+                          disabled={isLoading}
+                        />
+                        {question.imageUrl && (
+                          <div className="mt-2">
                             <img
-                              src={question.imagePreview || "/placeholder.svg"}
-                              alt={`Question ${index + 1}`}
+                              src={question.imageUrl}
+                              alt={`Preview ${index + 1}`}
                               className="w-full h-32 object-cover rounded-lg border"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display =
+                                  "none";
+                              }}
                             />
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="absolute top-2 right-2 h-8 w-8 p-0"
-                              onClick={() => removeImage(index)}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <div
-                            className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer"
-                            onClick={() => {
-                              const input = document.createElement("input");
-                              input.type = "file";
-                              input.accept = "image/*";
-                              input.onchange = (e) => {
-                                const file = (e.target as HTMLInputElement)
-                                  .files?.[0];
-                                if (file) handleImageUpload(index, file);
-                              };
-                              input.click();
-                            }}
-                          >
-                            <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-sm text-gray-600">
-                              Click to upload image
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              PNG, JPG, GIF up to 10MB
-                            </p>
                           </div>
                         )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label
+                            htmlFor={`q${index + 1}-word1`}
+                            className="text-sm font-medium"
+                          >
+                            Word 1 *
+                          </Label>
+                          <Input
+                            id={`q${index + 1}-word1`}
+                            placeholder="e.g., presentation"
+                            value={question.word1}
+                            onChange={(e) =>
+                              handlePart1Change(index, "word1", e.target.value)
+                            }
+                            className="mt-1"
+                            disabled={isLoading}
+                          />
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor={`q${index + 1}-word2`}
+                            className="text-sm font-medium"
+                          >
+                            Word 2 *
+                          </Label>
+                          <Input
+                            id={`q${index + 1}-word2`}
+                            placeholder="e.g., colleagues"
+                            value={question.word2}
+                            onChange={(e) =>
+                              handlePart1Change(index, "word2", e.target.value)
+                            }
+                            className="mt-1"
+                            disabled={isLoading}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -246,62 +355,123 @@ export default function AddExamPage() {
             </CardContent>
           </Card>
 
-          {/* Part 2 Prompts */}
+          {/* Part 2 Questions */}
           <Card className="shadow-sm border-0 bg-white/70 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
-                3. Part 2: Email Writing Tasks
+                3. Part 2: Email Response Tasks (6-7)
               </CardTitle>
               <p className="text-sm text-gray-600">
-                Create 2 email prompts for students to respond to
+                Create 2 email scenarios for students to respond to
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                {part2Prompts.map((prompt, index) => (
-                  <div key={index} className="space-y-2">
-                    <Label
-                      htmlFor={`part2-prompt-${index + 1}`}
-                      className="text-sm font-medium"
-                    >
-                      Email {index + 1} Prompt
-                    </Label>
-                    <Textarea
-                      id={`part2-prompt-${index + 1}`}
-                      placeholder={`Enter email ${
-                        index + 1
-                      } scenario and requirements...`}
-                      value={prompt}
-                      onChange={(e) => handlePart2Change(index, e.target.value)}
-                      className="min-h-[120px] resize-none"
-                    />
+              <div className="grid gap-6">
+                {part2Questions.map((question, index) => (
+                  <div
+                    key={index}
+                    className="space-y-4 p-6 border border-gray-200 rounded-xl bg-white/50"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-semibold text-xs">
+                          {index + 6}
+                        </span>
+                      </div>
+                      <h4 className="font-semibold">Email {index + 1}</h4>
+                    </div>
+
+                    <div>
+                      <Label
+                        htmlFor={`part2-title-${index + 1}`}
+                        className="text-sm font-medium"
+                      >
+                        Question Title
+                      </Label>
+                      <Input
+                        id={`part2-title-${index + 1}`}
+                        placeholder={`Task 2 - Question ${
+                          index + 6
+                        }: Email Response`}
+                        value={question.title}
+                        onChange={(e) =>
+                          handlePart2Change(index, "title", e.target.value)
+                        }
+                        className="mt-1"
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    <div>
+                      <Label
+                        htmlFor={`part2-prompt-${index + 1}`}
+                        className="text-sm font-medium"
+                      >
+                        Email Scenario & Instructions *
+                      </Label>
+                      <Textarea
+                        id={`part2-prompt-${index + 1}`}
+                        placeholder={`Enter the email content and response instructions...`}
+                        value={question.prompt}
+                        onChange={(e) =>
+                          handlePart2Change(index, "prompt", e.target.value)
+                        }
+                        className="min-h-[120px] resize-none mt-1"
+                        disabled={isLoading}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Part 3 Prompt */}
+          {/* Part 3 Question */}
           <Card className="shadow-sm border-0 bg-white/70 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
-                4. Part 3: Essay Writing Task
+                4. Part 3: Opinion Essay Task (8)
               </CardTitle>
               <p className="text-sm text-gray-600">
                 Create an essay prompt for the final writing task
               </p>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="part3-title" className="text-sm font-medium">
+                  Question Title
+                </Label>
+                <Input
+                  id="part3-title"
+                  placeholder="Task 3 - Question 8: Opinion Essay"
+                  value={part3Question.title}
+                  onChange={(e) =>
+                    setPart3Question({
+                      ...part3Question,
+                      title: e.target.value,
+                    })
+                  }
+                  className="mt-1"
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
                 <Label htmlFor="part3-prompt" className="text-sm font-medium">
-                  Essay Prompt
+                  Essay Prompt *
                 </Label>
                 <Textarea
                   id="part3-prompt"
-                  placeholder="Enter the essay topic, requirements, and any specific instructions..."
-                  value={part3Prompt}
-                  onChange={(e) => setPart3Prompt(e.target.value)}
-                  className="min-h-[140px] resize-none"
+                  placeholder="Enter the essay topic, question, and any specific instructions..."
+                  value={part3Question.prompt}
+                  onChange={(e) =>
+                    setPart3Question({
+                      ...part3Question,
+                      prompt: e.target.value,
+                    })
+                  }
+                  className="min-h-[140px] resize-none mt-1"
+                  disabled={isLoading}
                 />
               </div>
             </CardContent>
@@ -312,10 +482,15 @@ export default function AddExamPage() {
             <Button
               size="lg"
               onClick={handleSaveExam}
+              disabled={isLoading}
               className="gap-2 px-8 py-3 text-base"
             >
-              <Save className="w-5 h-5" />
-              Save Exam
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Save className="w-5 h-5" />
+              )}
+              {isLoading ? "Creating Exam..." : "Create Exam"}
             </Button>
           </div>
         </div>
