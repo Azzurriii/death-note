@@ -56,9 +56,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md px-4 py-8 sm:px-6 md:max-w-sm lg:px-8">
         {/* Logo and Header */}
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Death Note</h1>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight">
-            Welcome back
+          <h1 className="text-2xl font-death-note font-bold tracking-tight">
+            Death Note
+          </h1>
+          <h2 className="mt-2 text-3xl font-bold font-cloister tracking-tight">
+            Welcome Back
           </h2>
           <p className="mt-2 text-sm text-gray-500">
             Enter your email to sign in to your account
