@@ -96,16 +96,21 @@ export default function Part1Page() {
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-gray-900 no-underline"
+          >
             <Image
               src="/images/death-note.svg"
-              alt="TOEIC"
-              width={100}
-              height={100}
+              alt="Death Note"
+              width={40}
+              height={40}
               className="w-10 h-10"
             />
+            <span className="text-xl font-bold font-death-note">
+              Death Note
+            </span>
           </Link>
-
           <div className="flex items-center space-x-6">
             <TimerDisplay timeRemaining={timeRemaining} label="Part 1" />
             <div className="text-sm text-gray-600">Part 1/3</div>
