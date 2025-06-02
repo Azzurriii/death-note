@@ -48,14 +48,18 @@ export function Navigation() {
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-3">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-gray-900">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-gray-900 no-underline"
+        >
           <Image
             src="/images/death-note.svg"
             alt="Death Note"
-            width={100}
-            height={100}
+            width={40}
+            height={40}
             className="w-10 h-10"
           />
+          <span className="text-xl font-bold font-death-note">DEATH NOTE</span>
         </Link>
 
         <div className="flex items-center space-x-4">

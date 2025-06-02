@@ -1,6 +1,6 @@
+@import url('https://fonts.cdnfonts.com/css/death-note-font');
 @import "tailwindcss";
 @import "tw-animate-css";
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -123,4 +123,8 @@
 
 button {
   cursor: pointer;
+}
+
+.font-death-note {
+  font-family: 'Death Note Font', sans-serif;
 }
