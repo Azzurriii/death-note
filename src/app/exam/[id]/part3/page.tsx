@@ -157,10 +157,14 @@ export default function Part3Page() {
       localStorage.removeItem(`exam-${testId}-part2`);
       localStorage.removeItem(`exam-${testId}-part3`);
 
-      // Redirect to history page with attempt ID
-      router.push(`/history/${result.id}`);
+      // Show success toast
+      toast.success("Test submitted successfully! Redirecting to results...");
+
+      // Delay redirect to let user see the toast
+      setTimeout(() => {
+        router.push(`/history/${result.id}`);
+      }, 1500);
     } catch (error) {
-      console.error("Error submitting test:", error);
       toast.error("Error submitting test");
       setIsSubmitting(false);
     }
