@@ -399,7 +399,7 @@ export default function AddExamPage() {
                     className="space-y-4 p-6 border border-gray-200 rounded-xl bg-white/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
                         <span className="text-white font-semibold text-xs">
                           {index + 6}
                         </span>
@@ -463,6 +463,12 @@ export default function AddExamPage() {
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-xs">8</span>
+                </div>
+                <h4 className="font-semibold">Opinion Essay</h4>
+              </div>
               <div>
                 <Label htmlFor="part3-title" className="text-sm font-medium">
                   Question Title
