@@ -25,6 +25,7 @@ import { WordCountDisplay } from "@/components/word-count-display";
 import { testService } from "@/services/testService";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 export default function Part3Page() {
   const params = useParams();
@@ -160,11 +161,7 @@ export default function Part3Page() {
       router.push(`/history/${result.id}`);
     } catch (error) {
       console.error("Error submitting test:", error);
-      alert(
-        `Failed to submit test: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      toast.error("Error submitting test");
       setIsSubmitting(false);
     }
   };

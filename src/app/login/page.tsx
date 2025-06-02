@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { users } from "@/store/users";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -32,7 +33,7 @@ export default function LoginPage() {
       )?.id;
       if (!userId) {
         setIsLoading(false);
-        alert("Invalid username or password");
+        toast.error("Invalid username or password");
         return;
       }
 
@@ -46,7 +47,7 @@ export default function LoginPage() {
       }, 1000);
     } else {
       setIsLoading(false);
-      alert("Please enter both username and password");
+      toast.error("Please enter both username and password");
     }
   };
 

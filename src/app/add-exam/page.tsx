@@ -12,6 +12,7 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { Save, ArrowLeft, Loader2 } from "lucide-react";
 import { testService } from "@/services/testService";
 import { TestCreateDTO } from "@/types/test";
+import { toast } from "sonner";
 
 export default function AddExamPage() {
   const router = useRouter();
@@ -88,12 +89,12 @@ export default function AddExamPage() {
 
   const handleSaveExam = async () => {
     if (!examTitle.trim()) {
-      alert("Please enter an exam title");
+      toast.error("Please enter an exam title");
       return;
     }
 
     if (!examDescription.trim()) {
-      alert("Please enter an exam description");
+      toast.error("Please enter an exam description");
       return;
     }
 
@@ -101,7 +102,7 @@ export default function AddExamPage() {
     for (let i = 0; i < part1Questions.length; i++) {
       const q = part1Questions[i];
       if (!q.word1 || !q.word2) {
-        alert(`Please enter both words for Question ${i + 1}`);
+        toast.error(`Please enter both words for Question ${i + 1}`);
         return;
       }
     }
@@ -109,14 +110,14 @@ export default function AddExamPage() {
     // Validate Part 2 questions
     for (let i = 0; i < part2Questions.length; i++) {
       if (!part2Questions[i].prompt.trim()) {
-        alert(`Please enter prompt for Email ${i + 1}`);
+        toast.error(`Please enter prompt for Email ${i + 1}`);
         return;
       }
     }
 
     // Validate Part 3 question
     if (!part3Question.prompt.trim()) {
-      alert("Please enter the essay prompt");
+      toast.error("Please enter the essay prompt");
       return;
     }
 
@@ -159,11 +160,11 @@ export default function AddExamPage() {
       };
 
       const result = await testService.createTest(testData);
-      alert(`Exam "${result.title}" created successfully!`);
+      toast.success(`Exam "${result.title}" created successfully!`);
       router.push("/");
     } catch (error) {
       console.error("Error creating exam:", error);
-      alert(
+      toast.error(
         `Failed to create exam: ${
           error instanceof Error ? error.message : "Unknown error"
         }`
