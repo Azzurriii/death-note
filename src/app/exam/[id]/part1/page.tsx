@@ -152,19 +152,19 @@ export default function Part1Page() {
           {part1Questions.map((question, index) => (
             <div
               key={question.id}
-              className="bg-white rounded-lg border border-gray-200 p-6"
+              className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-gray-200"
             >
-              <h3 className="text-lg font-semibold mb-4">
+              <h3 className="text-xl font-bold mb-6 text-gray-900 border-b border-gray-100 pb-3">
                 Question {question.order_in_test}: {question.title}
               </h3>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   {question.image_url && (
                     <img
                       src={question.image_url}
                       alt={`Question ${question.order_in_test}`}
-                      className="rounded-lg border border-gray-200 w-full h-auto"
+                      className="rounded-xl border border-gray-100 w-full h-auto shadow-md"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
                           "/placeholder-image.jpg";
@@ -172,23 +172,23 @@ export default function Part1Page() {
                     />
                   )}
 
-                  <div className="mt-4 bg-yellow-50 p-3 rounded-lg">
-                    <p className="text-sm font-medium text-yellow-800 mb-2">
+                  <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                    <p className="text-base font-semibold text-blue-900 mb-3">
                       Use these words in your sentence:
                     </p>
-                    <div className="flex gap-2">
-                      <span className="bg-yellow-200 px-2 py-1 rounded text-yellow-800 text-sm font-medium">
+                    <div className="flex gap-3">
+                      <span className="bg-green-600 text-white px-4 py-2 rounded-lg text-base font-semibold shadow-sm">
                         {question.given_word1}
                       </span>
-                      <span className="bg-yellow-200 px-2 py-1 rounded text-yellow-800 text-sm font-medium">
+                      <span className="bg-blue-600 text-white px-4 py-2 rounded-lg text-base font-semibold shadow-sm">
                         {question.given_word2}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                <div className="space-y-4">
+                  <label className="block text-base font-semibold text-gray-800">
                     Type a sentence:
                   </label>
                   <textarea
@@ -197,7 +197,7 @@ export default function Part1Page() {
                     onChange={(e) =>
                       handleAnswerChange(question.id, e.target.value)
                     }
-                    className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    className="w-full min-h-[140px] p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none shadow-sm hover:shadow-md transition-shadow duration-200"
                   />
                   <WordCountDisplay text={answers[question.id] || ""} />
                 </div>

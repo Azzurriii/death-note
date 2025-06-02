@@ -24,6 +24,7 @@ import { TimerDisplay } from "@/components/timer-display";
 import { WordCountDisplay } from "@/components/word-count-display";
 import { testService } from "@/services/testService";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
 
 export default function Part3Page() {
   const params = useParams();
@@ -230,17 +231,17 @@ export default function Part3Page() {
           </div>
 
           {currentQuestion && (
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold mb-4">Essay Prompt:</h3>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-gray-200">
+              <h3 className="text-xl font-bold mb-6 text-gray-900 border-b border-gray-100 pb-3">
+                Essay Prompt:
+              </h3>
 
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                  {currentQuestion.prompt}
-                </div>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm prose prose-base max-w-none">
+                <ReactMarkdown>{currentQuestion.prompt}</ReactMarkdown>
               </div>
 
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="space-y-4">
+                <label className="block text-base font-semibold text-gray-800">
                   Your Essay:
                 </label>
                 <textarea
@@ -248,7 +249,7 @@ export default function Part3Page() {
                   value={answers[currentQuestion.id]?.user_answer || ""}
                   onChange={(e) => handleAnswerChange(e.target.value)}
                   disabled={isSubmitting}
-                  className="w-full min-h-[400px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none disabled:opacity-50"
+                  className="w-full min-h-[420px] p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none disabled:opacity-50 shadow-sm hover:shadow-md transition-shadow duration-200"
                 />
                 <WordCountDisplay
                   text={answers[currentQuestion.id]?.user_answer || ""}

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
 
 export default function Part2Page() {
   const params = useParams();
@@ -163,26 +164,24 @@ export default function Part2Page() {
           </div>
 
           {currentQuestion && (
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold mb-4">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-gray-200">
+              <h3 className="text-xl font-bold mb-6 text-gray-900 border-b border-gray-100 pb-3">
                 {currentQuestion.title}
               </h3>
 
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                  {currentQuestion.prompt}
-                </div>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm prose prose-base max-w-none">
+                <ReactMarkdown>{currentQuestion.prompt}</ReactMarkdown>
               </div>
 
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="space-y-4">
+                <label className="block text-base font-semibold text-gray-800">
                   Your Response:
                 </label>
                 <textarea
                   placeholder="Type your email response here..."
                   value={answers[currentQuestion.id] || ""}
                   onChange={(e) => handleAnswerChange(e.target.value)}
-                  className="w-full min-h-[300px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                  className="w-full min-h-[320px] p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none shadow-sm hover:shadow-md transition-shadow duration-200"
                 />
                 <WordCountDisplay text={answers[currentQuestion.id] || ""} />
               </div>
