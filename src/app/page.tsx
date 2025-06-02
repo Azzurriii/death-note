@@ -148,23 +148,28 @@ export default function ExamListPage() {
             {tests.map((test) => (
               <Card
                 key={test.id}
-                className="hover:shadow-md transition-shadow h-full flex flex-col"
+                className="hover:shadow-xl transition-all duration-300 h-full flex flex-col rounded-2xl border-gray-100 shadow-lg hover:border-gray-200"
               >
-                <CardHeader className="flex-grow">
-                  <CardTitle className="text-lg">{test.title}</CardTitle>
-                  <CardDescription className="text-sm">
+                <CardHeader className="flex-grow p-4">
+                  <CardTitle className="text-lg font-bold text-gray-900 mb-2">
+                    {test.title}
+                  </CardTitle>
+                  <CardDescription className="text-sm text-gray-600 mb-3">
                     {test.description}
                   </CardDescription>
-                  <div className="mt-2 space-y-1">
-                    <p className="text-xs text-gray-500">
-                      Questions: {test.question_count}
+                  <div className="mt-3 space-y-1.5">
+                    <p className="text-xs font-medium text-gray-600">
+                      Questions:{" "}
+                      <span className="font-semibold text-gray-800">
+                        {test.question_count}
+                      </span>
                     </p>
                     {test.has_attempted_by_user && test.last_attempt_status && (
                       <>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs font-medium text-gray-600">
                           Last Status:
                           <span
-                            className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                            className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
                               test.last_attempt_status === "completed"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-yellow-100 text-yellow-800"
@@ -174,18 +179,25 @@ export default function ExamListPage() {
                           </span>
                         </p>
                         {test.last_attempt_raw_score !== undefined && (
-                          <p className="text-xs text-gray-500">
-                            Last Score: {test.last_attempt_raw_score} (Scaled:{" "}
-                            {test.last_attempt_scaled_score})
+                          <p className="text-xs font-medium text-gray-600">
+                            Last Score:{" "}
+                            <span className="font-semibold text-gray-800">
+                              {test.last_attempt_raw_score}
+                            </span>{" "}
+                            (Scaled:{" "}
+                            <span className="font-semibold text-gray-800">
+                              {test.last_attempt_scaled_score}
+                            </span>
+                            )
                           </p>
                         )}
                       </>
                     )}
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0 space-y-2">
+                <CardContent className="pt-0 pb-4 px-4 space-y-2">
                   <Link href={`/exam/${test.id}/part1`} className="block">
-                    <Button className="w-full bg-black hover:bg-gray-800 text-white">
+                    <Button className="w-full bg-black hover:bg-gray-800 text-white py-2 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all duration-200 text-sm">
                       Start Exam
                     </Button>
                   </Link>
@@ -193,7 +205,7 @@ export default function ExamListPage() {
                     <Button
                       onClick={() => handleShowAttempts(test.id, test.title)}
                       variant="outline"
-                      className="w-full"
+                      className="w-full py-2 rounded-xl font-semibold border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 text-sm"
                     >
                       See Attempts
                     </Button>

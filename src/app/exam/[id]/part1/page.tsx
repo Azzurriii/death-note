@@ -172,15 +172,15 @@ export default function Part1Page() {
                     />
                   )}
 
-                  <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-5 rounded-xl shadow-sm">
-                    <p className="text-base font-semibold text-blue-900 mb-3">
+                  <div className="mt-6 bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
+                    <p className="text-base font-semibold text-gray-900 mb-3">
                       Use these words in your sentence:
                     </p>
-                    <div className="flex gap-3">
-                      <span className="bg-green-600 text-white px-4 py-2 rounded-lg text-base font-semibold shadow-sm">
+                    <div className="flex gap-2">
+                      <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm">
                         {question.given_word1}
                       </span>
-                      <span className="bg-blue-600 text-white px-4 py-2 rounded-lg text-base font-semibold shadow-sm">
+                      <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm">
                         {question.given_word2}
                       </span>
                     </div>
