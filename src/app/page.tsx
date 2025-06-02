@@ -57,7 +57,7 @@ export default function ExamListPage() {
   // Show loading while checking authentication
   if (isAuthenticating) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -65,13 +65,13 @@ export default function ExamListPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <main className="max-w-7xl mx-auto px-6 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Available Exams
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Choose an exam to start practicing your TOEIC Writing skills
             </p>
           </div>
@@ -87,26 +87,26 @@ export default function ExamListPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <main className="max-w-7xl mx-auto px-6 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Available Exams
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Choose an exam to start practicing your TOEIC Writing skills
             </p>
           </div>
           <div className="text-center py-8">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-red-800 mb-2">
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-lg font-semibold text-destructive mb-2">
                 Error Loading Exams
               </h3>
-              <p className="text-red-600 mb-4">{error}</p>
+              <p className="text-destructive/80 mb-4">{error}</p>
               <Button
                 onClick={refetch}
                 variant="outline"
-                className="border-red-300 text-red-700 hover:bg-red-50"
+                className="border-destructive/30 text-destructive hover:bg-destructive/10"
               >
                 Try Again
               </Button>
@@ -126,20 +126,20 @@ export default function ExamListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Available Exams
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Choose an exam to start practicing your TOEIC Writing skills
           </p>
         </div>
 
         {!tests || tests.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 text-lg">
+            <p className="text-muted-foreground text-lg">
               No exams available at the moment.
             </p>
           </div>
@@ -148,25 +148,25 @@ export default function ExamListPage() {
             {tests.map((test) => (
               <Card
                 key={test.id}
-                className="hover:shadow-xl transition-all duration-300 h-full flex flex-col rounded-2xl border-gray-100 shadow-lg hover:border-gray-200"
+                className="hover:shadow-xl transition-all duration-300 h-full flex flex-col rounded-2xl border-border shadow-lg hover:border-muted"
               >
                 <CardHeader className="flex-grow p-4">
-                  <CardTitle className="text-lg font-bold text-gray-900 mb-2">
+                  <CardTitle className="text-lg font-bold text-foreground mb-2">
                     {test.title}
                   </CardTitle>
-                  <CardDescription className="text-sm text-gray-600 mb-3">
+                  <CardDescription className="text-sm text-muted-foreground mb-3">
                     {test.description}
                   </CardDescription>
                   <div className="mt-3 space-y-1.5">
-                    <p className="text-xs font-medium text-gray-600">
+                    <p className="text-xs font-medium text-muted-foreground">
                       Questions:{" "}
-                      <span className="font-semibold text-gray-800">
+                      <span className="font-semibold text-foreground">
                         {test.question_count}
                       </span>
                     </p>
                     {test.has_attempted_by_user && test.last_attempt_status && (
                       <>
-                        <p className="text-xs font-medium text-gray-600">
+                        <p className="text-xs font-medium text-muted-foreground">
                           Last Status:
                           <span
                             className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -179,13 +179,13 @@ export default function ExamListPage() {
                           </span>
                         </p>
                         {test.last_attempt_raw_score !== undefined && (
-                          <p className="text-xs font-medium text-gray-600">
+                          <p className="text-xs font-medium text-muted-foreground">
                             Last Score:{" "}
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-foreground">
                               {test.last_attempt_raw_score}
                             </span>{" "}
                             (Scaled:{" "}
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-foreground">
                               {test.last_attempt_scaled_score}
                             </span>
                             )
@@ -197,7 +197,7 @@ export default function ExamListPage() {
                 </CardHeader>
                 <CardContent className="pt-0 pb-4 px-4 space-y-2">
                   <Link href={`/exam/${test.id}/part1`} className="block">
-                    <Button className="w-full bg-black hover:bg-gray-800 text-white py-2 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all duration-200 text-sm">
+                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all duration-200 text-sm">
                       Start Exam
                     </Button>
                   </Link>
@@ -205,7 +205,7 @@ export default function ExamListPage() {
                     <Button
                       onClick={() => handleShowAttempts(test.id, test.title)}
                       variant="outline"
-                      className="w-full py-2 rounded-xl font-semibold border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 text-sm"
+                      className="w-full py-2 rounded-xl font-semibold border-border hover:border-muted hover:bg-muted/50 transition-all duration-200 text-sm"
                     >
                       See Attempts
                     </Button>

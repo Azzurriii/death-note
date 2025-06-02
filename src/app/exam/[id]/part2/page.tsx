@@ -57,7 +57,7 @@ export default function Part2Page() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -65,10 +65,10 @@ export default function Part2Page() {
 
   if (error || !test) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-          <p className="text-gray-600">{error || "Test not found"}</p>
+          <h2 className="text-xl font-semibold text-destructive mb-2">Error</h2>
+          <p className="text-muted-foreground">{error || "Test not found"}</p>
         </div>
       </div>
     );
@@ -110,13 +110,13 @@ export default function Part2Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+      <header className="fixed top-0 left-0 right-0 bg-background border-b border-border px-6 py-4 z-10">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <Link
             href="/"
-            className="flex items-center gap-2 text-gray-900 no-underline"
+            className="flex items-center gap-2 text-foreground no-underline"
           >
             <Image
               src="/images/death-note.svg"
@@ -131,8 +131,8 @@ export default function Part2Page() {
           </Link>
           <div className="flex items-center space-x-6">
             <TimerDisplay timeRemaining={timeRemaining} label="Part 2" />
-            <div className="text-sm text-gray-600">Part 2/3</div>
-            <Progress value={66.66} className="w-24" />
+            <div className="text-sm text-muted-foreground">Part 2/3</div>
+            <Progress value={66.67} className="w-24" />
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -163,31 +163,33 @@ export default function Part2Page() {
       <main className="pt-20 pb-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Part 2: Responding to a Written Request
             </h2>
-            <p className="text-gray-600">Email {currentEmail + 1} of 2</p>
+            <p className="text-muted-foreground">
+              Email {currentEmail + 1} of 2
+            </p>
           </div>
 
           {currentQuestion && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-gray-200">
-              <h3 className="text-xl font-bold mb-6 text-gray-900 border-b border-gray-100 pb-3">
+            <div className="bg-card rounded-2xl border border-border shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-muted">
+              <h3 className="text-xl font-bold mb-6 text-foreground border-b border-border pb-3">
                 {currentQuestion.title}
               </h3>
 
-              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm prose prose-base max-w-none">
+              <div className="bg-card border border-border rounded-xl p-6 mb-8 shadow-sm prose prose-base max-w-none">
                 <ReactMarkdown>{currentQuestion.prompt}</ReactMarkdown>
               </div>
 
               <div className="space-y-4">
-                <label className="block text-base font-semibold text-gray-800">
+                <label className="block text-base font-semibold text-foreground">
                   Your Response:
                 </label>
                 <textarea
                   placeholder="Type your email response here..."
                   value={answers[currentQuestion.id] || ""}
                   onChange={(e) => handleAnswerChange(e.target.value)}
-                  className="w-full min-h-[320px] p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none shadow-sm hover:shadow-md transition-shadow duration-200"
+                  className="w-full min-h-[320px] p-4 border border-border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none shadow-sm hover:shadow-md transition-shadow duration-200"
                 />
                 <WordCountDisplay text={answers[currentQuestion.id] || ""} />
               </div>
@@ -197,7 +199,7 @@ export default function Part2Page() {
       </main>
 
       {/* Fixed Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+      <footer className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-6 py-4">
         <div className="max-w-4xl mx-auto text-center">
           {currentEmail === 0 ? (
             <Button size="lg" onClick={handleNextEmail}>

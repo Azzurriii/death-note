@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { users } from "@/store/users";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -52,17 +53,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-white">
+    <div className="flex min-h-screen w-full items-center justify-center bg-background">
+      {/* Theme Toggle - Top Right */}
+      <div className="fixed top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md px-4 py-8 sm:px-6 md:max-w-sm lg:px-8">
         {/* Logo and Header */}
         <div className="text-center">
-          <h1 className="text-2xl font-death-note font-bold tracking-tight">
+          <h1 className="text-2xl font-death-note font-bold tracking-tight text-foreground">
             Death Note
           </h1>
-          <h2 className="mt-2 text-3xl font-bold font-cloister tracking-tight">
+          <h2 className="mt-2 text-3xl font-bold font-cloister tracking-tight text-foreground">
             Welcome Back
           </h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             Enter your email to sign in to your account
           </p>
         </div>
@@ -71,7 +77,10 @@ export default function LoginPage() {
         <div className="mt-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-foreground"
+              >
                 Username
               </label>
               <div className="mt-1">
@@ -84,19 +93,22 @@ export default function LoginPage() {
                   disabled={isLoading}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-foreground"
+                >
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-gray-500 hover:text-black"
+                  className="text-xs text-muted-foreground hover:text-foreground"
                 >
                   Forgot password?
                 </Link>
@@ -111,14 +123,14 @@ export default function LoginPage() {
                   disabled={isLoading}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
             </div>
 
             <Button
               type="submit"
-              className="h-10 w-full rounded-md bg-black text-sm font-medium text-white transition-colors hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1 disabled:opacity-50"
+              className="h-10 w-full rounded-md bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 disabled:opacity-50"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
@@ -130,10 +142,10 @@ export default function LoginPage() {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">
+              <span className="bg-background px-2 text-muted-foreground">
                 Or continue with
               </span>
             </div>
@@ -143,7 +155,7 @@ export default function LoginPage() {
             <Button
               variant="outline"
               type="button"
-              className="h-10 w-full rounded-md border border-gray-200 bg-white text-sm font-normal text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1"
+              className="h-10 w-full rounded-md border border-border bg-background text-sm font-normal text-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
             >
               <svg
                 className="mr-2 h-4 w-4"
@@ -174,7 +186,7 @@ export default function LoginPage() {
             <Button
               variant="outline"
               type="button"
-              className="h-10 w-full rounded-md border border-gray-200 bg-white text-sm font-normal text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1"
+              className="h-10 w-full rounded-md border border-border bg-background text-sm font-normal text-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
             >
               <svg
                 className="mr-2 h-4 w-4"
@@ -192,11 +204,11 @@ export default function LoginPage() {
 
         {/* Sign Up Link */}
         <div className="mt-8 text-center text-sm">
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             Don't have an account?{" "}
             <Link
               href="/register"
-              className="font-medium text-black hover:underline"
+              className="font-medium text-primary hover:underline"
             >
               Sign up
             </Link>

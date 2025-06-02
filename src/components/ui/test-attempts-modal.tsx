@@ -85,52 +85,54 @@ export function TestAttemptsModal({
             </div>
           ) : error ? (
             <div className="text-center py-8">
-              <p className="text-red-600 mb-4">{error}</p>
+              <p className="text-destructive mb-4">{error}</p>
               <Button onClick={fetchAttempts} variant="outline">
                 Try Again
               </Button>
             </div>
           ) : attempts.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">No attempts found for this test.</p>
+              <p className="text-muted-foreground">
+                No attempts found for this test.
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
               {attempts.map((attempt) => (
                 <div
                   key={attempt.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="border border-border rounded-lg p-4 hover:bg-muted/50 cursor-pointer transition-colors"
                   onClick={() => handleAttemptClick(attempt.id)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium">
+                        <span className="text-sm font-medium text-foreground">
                           Attempt #{attempt.id}
                         </span>
                         <span
                           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                             attempt.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                           }`}
                         >
                           {attempt.status}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-1">
+                      <p className="text-sm text-muted-foreground mb-1">
                         Submitted: {formatDate(attempt.submitted_at)}
                       </p>
                       <div className="flex items-center gap-4 text-sm">
-                        <span className="text-gray-600">
+                        <span className="text-muted-foreground">
                           Raw Score:{" "}
-                          <span className="font-medium">
+                          <span className="font-medium text-foreground">
                             {attempt.total_raw_score}
                           </span>
                         </span>
-                        <span className="text-gray-600">
+                        <span className="text-muted-foreground">
                           Scaled Score:{" "}
-                          <span className="font-medium">
+                          <span className="font-medium text-foreground">
                             {attempt.scaled_score}
                           </span>
                         </span>

@@ -50,7 +50,7 @@ export default function Part1Page() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -58,10 +58,10 @@ export default function Part1Page() {
 
   if (error || !test) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-          <p className="text-gray-600">{error || "Test not found"}</p>
+          <h2 className="text-xl font-semibold text-destructive mb-2">Error</h2>
+          <p className="text-muted-foreground">{error || "Test not found"}</p>
         </div>
       </div>
     );
@@ -92,13 +92,13 @@ export default function Part1Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+      <header className="fixed top-0 left-0 right-0 bg-background border-b border-border px-6 py-4 z-10">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <Link
             href="/"
-            className="flex items-center gap-2 text-gray-900 no-underline"
+            className="flex items-center gap-2 text-foreground no-underline"
           >
             <Image
               src="/images/death-note.svg"
@@ -113,7 +113,7 @@ export default function Part1Page() {
           </Link>
           <div className="flex items-center space-x-6">
             <TimerDisplay timeRemaining={timeRemaining} label="Part 1" />
-            <div className="text-sm text-gray-600">Part 1/3</div>
+            <div className="text-sm text-muted-foreground">Part 1/3</div>
             <Progress value={33.33} className="w-24" />
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -145,10 +145,10 @@ export default function Part1Page() {
       <main className="pt-20 pb-24 px-6">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Part 1: Writing a Sentence based on a Picture
             </h2>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Write one sentence for each question using the given keywords and
               describing the image.
             </p>
@@ -157,9 +157,9 @@ export default function Part1Page() {
           {part1Questions.map((question, index) => (
             <div
               key={question.id}
-              className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-gray-200"
+              className="bg-card rounded-2xl border border-border shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-muted"
             >
-              <h3 className="text-xl font-bold mb-6 text-gray-900 border-b border-gray-100 pb-3">
+              <h3 className="text-xl font-bold mb-6 text-foreground border-b border-border pb-3">
                 Question {question.order_in_test}: {question.title}
               </h3>
 
@@ -169,7 +169,7 @@ export default function Part1Page() {
                     <img
                       src={question.image_url}
                       alt={`Question ${question.order_in_test}`}
-                      className="rounded-xl border border-gray-100 w-full h-auto shadow-md"
+                      className="rounded-xl border border-border w-full h-auto shadow-md"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
                           "/placeholder-image.jpg";
@@ -177,15 +177,15 @@ export default function Part1Page() {
                     />
                   )}
 
-                  <div className="mt-6 bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
-                    <p className="text-base font-semibold text-gray-900 mb-3">
+                  <div className="mt-6 bg-card border border-border p-5 rounded-xl shadow-sm">
+                    <p className="text-base font-semibold text-foreground mb-3">
                       Use these words in your sentence:
                     </p>
                     <div className="flex gap-2">
-                      <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm">
+                      <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-sm">
                         {question.given_word1}
                       </span>
-                      <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm">
+                      <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-sm">
                         {question.given_word2}
                       </span>
                     </div>
@@ -193,7 +193,7 @@ export default function Part1Page() {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="block text-base font-semibold text-gray-800">
+                  <label className="block text-base font-semibold text-foreground">
                     Type a sentence:
                   </label>
                   <textarea
@@ -213,7 +213,7 @@ export default function Part1Page() {
       </main>
 
       {/* Fixed Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+      <footer className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-6 py-4">
         <div className="max-w-4xl mx-auto text-center">
           <AlertDialog>
             <AlertDialogTrigger asChild>

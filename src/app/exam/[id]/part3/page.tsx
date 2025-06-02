@@ -53,7 +53,7 @@ export default function Part3Page() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -61,10 +61,10 @@ export default function Part3Page() {
 
   if (error || !test) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-          <p className="text-gray-600">{error || "Test not found"}</p>
+          <h2 className="text-xl font-semibold text-destructive mb-2">Error</h2>
+          <p className="text-muted-foreground">{error || "Test not found"}</p>
         </div>
       </div>
     );
@@ -175,13 +175,13 @@ export default function Part3Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+      <header className="fixed top-0 left-0 right-0 bg-background border-b border-border px-6 py-4 z-10">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <Link
             href="/"
-            className="flex items-center gap-2 text-gray-900 no-underline"
+            className="flex items-center gap-2 text-foreground no-underline"
           >
             <Image
               src="/images/death-note.svg"
@@ -196,7 +196,7 @@ export default function Part3Page() {
           </Link>
           <div className="flex items-center space-x-6">
             <TimerDisplay timeRemaining={timeRemaining} label="Part 3" />
-            <div className="text-sm text-gray-600">Part 3/3</div>
+            <div className="text-sm text-muted-foreground">Part 3/3</div>
             <Progress value={100} className="w-24" />
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -228,27 +228,27 @@ export default function Part3Page() {
       <main className="pt-20 pb-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Part 3: Writing an Opinion Essay
             </h2>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Write a well-structured essay expressing your opinion on the given
               topic.
             </p>
           </div>
 
           {currentQuestion && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-gray-200">
-              <h3 className="text-xl font-bold mb-6 text-gray-900 border-b border-gray-100 pb-3">
+            <div className="bg-card rounded-2xl border border-border shadow-lg hover:shadow-xl transition-all duration-300 p-8 hover:border-muted">
+              <h3 className="text-xl font-bold mb-6 text-foreground border-b border-border pb-3">
                 Essay Prompt:
               </h3>
 
-              <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm prose prose-base max-w-none">
+              <div className="bg-card border border-border rounded-xl p-6 mb-8 shadow-sm prose prose-base max-w-none">
                 <ReactMarkdown>{currentQuestion.prompt}</ReactMarkdown>
               </div>
 
               <div className="space-y-4">
-                <label className="block text-base font-semibold text-gray-800">
+                <label className="block text-base font-semibold text-foreground">
                   Your Essay:
                 </label>
                 <textarea
@@ -268,7 +268,7 @@ export default function Part3Page() {
       </main>
 
       {/* Fixed Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+      <footer className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-6 py-4">
         <div className="max-w-4xl mx-auto text-center">
           <AlertDialog>
             <AlertDialogTrigger asChild>

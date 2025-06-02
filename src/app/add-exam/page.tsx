@@ -175,9 +175,9 @@ export default function AddExamPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-background/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
             <Button
@@ -191,10 +191,10 @@ export default function AddExamPage() {
               Back
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-foreground">
                 Create New Exam
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Design a custom TOEIC Writing exam
               </p>
             </div>
@@ -211,13 +211,13 @@ export default function AddExamPage() {
               <span className="w-2 h-2 bg-green-500 rounded-full"></span>
               Step 1 of 1
             </Badge>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               Complete all sections to save your exam
             </span>
           </div>
 
           {/* Basic Info */}
-          <Card className="shadow-sm border-0 bg-white/70 backdrop-blur-sm">
+          <Card className="shadow-sm border-0 bg-card/70 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
                 1. Basic Information
@@ -257,12 +257,12 @@ export default function AddExamPage() {
           </Card>
 
           {/* Part 1 Questions */}
-          <Card className="shadow-sm border-0 bg-white/70 backdrop-blur-sm">
+          <Card className="shadow-sm border-0 bg-card/70 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
                 2. Part 1: Picture Description Questions (1-5)
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Create 5 questions with keywords and image URLs for students to
                 describe
               </p>
@@ -272,7 +272,7 @@ export default function AddExamPage() {
                 {part1Questions.map((question, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 rounded-xl p-6 bg-white/50"
+                    className="border border-border rounded-xl p-6 bg-card/50"
                   >
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
@@ -383,12 +383,12 @@ export default function AddExamPage() {
           </Card>
 
           {/* Part 2 Questions */}
-          <Card className="shadow-sm border-0 bg-white/70 backdrop-blur-sm">
+          <Card className="shadow-sm border-0 bg-card/70 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
                 3. Part 2: Email Response Tasks (6-7)
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Create 2 email scenarios for students to respond to
               </p>
             </CardHeader>
@@ -397,7 +397,7 @@ export default function AddExamPage() {
                 {part2Questions.map((question, index) => (
                   <div
                     key={index}
-                    className="space-y-4 p-6 border border-gray-200 rounded-xl bg-white/50"
+                    className="space-y-4 p-6 border border-border rounded-xl bg-card/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
@@ -454,12 +454,12 @@ export default function AddExamPage() {
           </Card>
 
           {/* Part 3 Question */}
-          <Card className="shadow-sm border-0 bg-white/70 backdrop-blur-sm">
+          <Card className="shadow-sm border-0 bg-card/70 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
                 4. Part 3: Opinion Essay Task (8)
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Create an essay prompt for the final writing task
               </p>
             </CardHeader>

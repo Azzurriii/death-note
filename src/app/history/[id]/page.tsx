@@ -16,7 +16,7 @@ export default function ExamDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -24,10 +24,10 @@ export default function ExamDetailPage() {
 
   if (error || !submission) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-          <p className="text-gray-500 text-lg mb-4">
+          <h2 className="text-xl font-semibold text-destructive mb-2">Error</h2>
+          <p className="text-muted-foreground text-lg mb-4">
             {error || "No submission found for this attempt."}
           </p>
           <Link href="/">
@@ -68,9 +68,9 @@ export default function ExamDetailPage() {
   const renderAnswer = (answer: AnswerResponseDTO) => (
     <div
       key={answer.id}
-      className="border-b border-gray-200 pb-6 last:border-b-0"
+      className="border-b border-border pb-6 last:border-b-0"
     >
-      <h4 className="font-semibold mb-3">
+      <h4 className="font-semibold mb-3 text-foreground">
         Question {answer.question.order_in_test}: {answer.question.title}
       </h4>
 
@@ -82,7 +82,7 @@ export default function ExamDetailPage() {
               <img
                 src={answer.question.image_url}
                 alt={`Question ${answer.question.order_in_test}`}
-                className="w-full max-w-md h-48 object-cover rounded-lg border"
+                className="w-full max-w-md h-48 object-cover rounded-lg border border-border"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
@@ -90,15 +90,15 @@ export default function ExamDetailPage() {
             </div>
           )}
           {answer.question.given_word1 && answer.question.given_word2 && (
-            <div className="bg-yellow-50 p-3 rounded-lg mb-3">
-              <p className="text-sm font-medium text-yellow-800 mb-1">
-                Required words:
+            <div className="mt-6 bg-card border border-border p-5 rounded-xl shadow-sm">
+              <p className="text-base font-semibold text-foreground mb-3">
+                Given words:
               </p>
               <div className="flex gap-2">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-sm">
                   {answer.question.given_word1}
                 </span>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-sm">
                   {answer.question.given_word2}
                 </span>
               </div>
@@ -111,8 +111,8 @@ export default function ExamDetailPage() {
       {(answer.question.type === "email_response" ||
         answer.question.type === "opinion_essay") && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">Prompt:</p>
-          <div className="text-gray-700 bg-gray-50 p-3 rounded border whitespace-pre-line">
+          <p className="text-sm font-medium text-foreground mb-2">Prompt:</p>
+          <div className="text-foreground bg-muted p-3 rounded border border-border whitespace-pre-line">
             {answer.question.prompt}
           </div>
         </div>
@@ -120,26 +120,28 @@ export default function ExamDetailPage() {
 
       {/* User's answer */}
       <div className="mb-4">
-        <h5 className="text-sm font-semibold text-gray-700 mb-2">
+        <h5 className="text-sm font-semibold text-foreground mb-2">
           Your Answer:
         </h5>
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <p className="whitespace-pre-wrap">{answer.user_answer}</p>
+        <div className="bg-card border border-border rounded-lg p-3">
+          <p className="whitespace-pre-wrap text-foreground">
+            {answer.user_answer}
+          </p>
         </div>
       </div>
 
       {/* AI Feedback */}
       <div>
-        <h5 className="text-sm font-semibold text-gray-700 mb-2">
+        <h5 className="text-sm font-semibold text-foreground mb-2">
           AI Feedback:
         </h5>
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
-          <div className="text-gray-800 prose prose-sm max-w-none">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-lg p-3">
+          <div className="text-foreground prose prose-sm max-w-none">
             <ReactMarkdown>{answer.ai_feedback}</ReactMarkdown>
           </div>
         </div>
         <div className="mt-2 text-right">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
             Score: {answer.ai_score} / {answer.question.max_score}
           </span>
         </div>
@@ -148,22 +150,22 @@ export default function ExamDetailPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-background border-b border-border px-6 py-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-foreground">
                 Test Results: {submission.test_title}
               </h1>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Submitted on {formatDate(submission.submitted_at)}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Total Questions Answered: {submission.answers.length}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Status: {submission.status}
               </p>
             </div>
@@ -181,7 +183,7 @@ export default function ExamDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Part 1: Picture Description (Questions 1-5)</CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Write one sentence based on each picture using the given words.
               </p>
             </CardHeader>
@@ -196,7 +198,7 @@ export default function ExamDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Part 2: Email Response (Questions 6-7)</CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Respond to written requests with appropriate emails.
               </p>
             </CardHeader>
@@ -211,8 +213,8 @@ export default function ExamDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Part 3: Opinion Essay (Question 8)</CardTitle>
-              <p className="text-sm text-gray-600">
-                Write a well-structured essay expressing your opinion.
+              <p className="text-sm text-muted-foreground">
+                Write an essay expressing your opinion on the given topic.
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -228,14 +230,14 @@ export default function ExamDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-6">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {part1Answers.length}
                 </div>
-                <div className="text-sm text-gray-600 mb-1">
+                <div className="text-sm text-muted-foreground mb-1">
                   Part 1 Questions
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   {part1Answers.reduce(
                     (sum, answer) => sum + answer.ai_score,
                     0
@@ -248,14 +250,14 @@ export default function ExamDetailPage() {
                   points
                 </div>
               </div>
-              <div className="bg-green-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {part2Answers.length}
                 </div>
-                <div className="text-sm text-gray-600 mb-1">
+                <div className="text-sm text-muted-foreground mb-1">
                   Part 2 Questions
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   {part2Answers.reduce(
                     (sum, answer) => sum + answer.ai_score,
                     0
@@ -268,14 +270,14 @@ export default function ExamDetailPage() {
                   points
                 </div>
               </div>
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {part3Answers.length}
                 </div>
-                <div className="text-sm text-gray-600 mb-1">
+                <div className="text-sm text-muted-foreground mb-1">
                   Part 3 Questions
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   {part3Answers.reduce(
                     (sum, answer) => sum + answer.ai_score,
                     0
@@ -288,33 +290,35 @@ export default function ExamDetailPage() {
                   points
                 </div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-gray-600">
+              <div className="bg-muted p-4 rounded-lg">
+                <div className="text-2xl font-bold text-muted-foreground">
                   {submission.total_raw_score} / 28
                 </div>
-                <div className="text-sm text-gray-600 mb-1">
+                <div className="text-sm text-muted-foreground mb-1">
                   Total Raw Score
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   API calculated score
                 </div>
               </div>
             </div>
 
             {/* Additional Score Information */}
-            <div className="border-t pt-4">
+            <div className="border-t border-border pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                <div className="bg-indigo-50 p-4 rounded-lg">
-                  <div className="text-lg font-semibold text-indigo-700">
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                  <div className="text-lg font-semibold text-indigo-700 dark:text-indigo-400">
                     Raw Score: {submission.total_raw_score} / 28
                   </div>
-                  <div className="text-sm text-gray-600">Total raw points</div>
+                  <div className="text-sm text-muted-foreground">
+                    Total raw points
+                  </div>
                 </div>
-                <div className="bg-teal-50 p-4 rounded-lg">
-                  <div className="text-lg font-semibold text-teal-700">
+                <div className="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg">
+                  <div className="text-lg font-semibold text-teal-700 dark:text-teal-400">
                     Scaled Score: {submission.scaled_score} / 200
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     TOEIC Writing Scale
                   </div>
                 </div>

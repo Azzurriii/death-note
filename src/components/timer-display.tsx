@@ -17,7 +17,7 @@ export function TimerDisplay({ timeRemaining, label }: TimerDisplayProps) {
   return (
     <div
       className={`text-lg font-bold ${
-        isLowTime ? "text-red-600" : "text-gray-900"
+        isLowTime ? "text-red-600" : "text-foreground"
       }`}
     >
       {label}: {formatTime(timeRemaining)}
