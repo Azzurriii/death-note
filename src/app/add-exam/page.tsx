@@ -134,7 +134,7 @@ export default function AddExamPage() {
               "Write ONE sentence based on the picture using the two words or phrases.",
             type: "sentence_picture" as const,
             order_in_test: index + 1,
-            max_score: 5.0, // Default max score for sentence_picture questions
+            max_score: 3.0,
             image_url: q.imageUrl || undefined,
             given_word1: q.word1,
             given_word2: q.word2,
@@ -145,7 +145,7 @@ export default function AddExamPage() {
             prompt: q.prompt,
             type: "email_response" as const,
             order_in_test: index + 6,
-            max_score: 10.0, // Default max score for email_response questions
+            max_score: 4.0,
           })),
           // Part 3 question (8)
           {
@@ -153,7 +153,7 @@ export default function AddExamPage() {
             prompt: part3Question.prompt,
             type: "opinion_essay" as const,
             order_in_test: 8,
-            max_score: 15.0, // Default max score for opinion_essay question
+            max_score: 5.0,
           },
         ],
       };
