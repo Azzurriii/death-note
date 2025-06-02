@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BookOpen, History, Plus, LogOut } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
+import { users } from "@/store/users";
 
 export function Navigation() {
   const pathname = usePathname();
@@ -94,7 +95,10 @@ export function Navigation() {
           {/* User Info and Logout */}
           <div className="flex items-center space-x-4 border-l border-gray-200 pl-4">
             {username && (
-              <span className="text-sm text-gray-600">Welcome, {username}</span>
+              <span className="text-sm text-gray-600">
+                Welcome back,{" "}
+                {users.find((user) => user.username === username)?.name}
+              </span>
             )}
             <Button
               variant="ghost"
