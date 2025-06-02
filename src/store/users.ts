@@ -6,7 +6,7 @@ export const users = [
   },
   {
     id: 2,
-    username: "user2",
+    username: "trinhhalan",
     password: "123456",
   },
 ];
