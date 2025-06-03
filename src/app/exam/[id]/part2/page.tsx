@@ -33,16 +33,56 @@ export default function Part2Page() {
   const [currentEmail, setCurrentEmail] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(10 * 60); // 10 minutes per email
 
+  // Load existing answers from localStorage on component mount
+  useEffect(() => {
+    const existingData = localStorage.getItem("exam-2");
+    if (existingData) {
+      try {
+        const parsedData = JSON.parse(existingData);
+        if (Array.isArray(parsedData)) {
+          // Convert UserAnswerDTO[] back to Record<number, string>
+          const answersMap: Record<number, string> = {};
+          parsedData.forEach((item: any) => {
+            if (item.question_id && item.user_answer) {
+              answersMap[item.question_id] = item.user_answer;
+            }
+          });
+          setAnswers(answersMap);
+        }
+      } catch (error) {
+        console.error("Error loading existing answers:", error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           // Auto-proceed when time runs out
           if (currentEmail === 0) {
+            // Save current progress before auto-advancing
+            const submitAnswers = Object.entries(answers).map(
+              ([questionId, answer]) => ({
+                question_id: parseInt(questionId),
+                user_answer: answer,
+              })
+            );
+            localStorage.setItem(`exam-2`, JSON.stringify(submitAnswers));
+
             // Move to next email
             setCurrentEmail(1);
             return 10 * 60; // Reset timer for next email
           } else {
+            // Save final progress before auto-advancing to Part 3
+            const submitAnswers = Object.entries(answers).map(
+              ([questionId, answer]) => ({
+                question_id: parseInt(questionId),
+                user_answer: answer,
+              })
+            );
+            localStorage.setItem(`exam-2`, JSON.stringify(submitAnswers));
+
             // Move to Part 3
             router.push(`/exam/${testId}/part3`);
             return 0;
@@ -53,7 +93,7 @@ export default function Part2Page() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentEmail, testId, router]);
+  }, [currentEmail, testId, router, answers]);
 
   if (loading) {
     return (
@@ -88,6 +128,15 @@ export default function Part2Page() {
 
   const handleNextEmail = () => {
     if (currentEmail === 0) {
+      // Save current progress before switching to next email
+      const submitAnswers = Object.entries(answers).map(
+        ([questionId, answer]) => ({
+          question_id: parseInt(questionId),
+          user_answer: answer,
+        })
+      );
+      localStorage.setItem(`exam-2`, JSON.stringify(submitAnswers));
+
       setCurrentEmail(1);
       setTimeRemaining(10 * 60); // Reset timer for next email
     }
@@ -101,7 +150,7 @@ export default function Part2Page() {
         user_answer: answer,
       })
     );
-    localStorage.setItem(`exam-${testId}-part2`, JSON.stringify(submitAnswers));
+    localStorage.setItem(`exam-2`, JSON.stringify(submitAnswers));
     router.push(`/exam/${testId}/part3`);
   };
 

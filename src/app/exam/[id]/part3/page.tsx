@@ -36,6 +36,21 @@ export default function Part3Page() {
   const [timeRemaining, setTimeRemaining] = useState(30 * 60); // 30 minutes
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Load existing answers from localStorage on component mount
+  useEffect(() => {
+    const existingData = localStorage.getItem("exam-3");
+    if (existingData) {
+      try {
+        const parsedData = JSON.parse(existingData);
+        if (typeof parsedData === "object" && parsedData !== null) {
+          setAnswers(parsedData);
+        }
+      } catch (error) {
+        console.error("Error loading existing answers:", error);
+      }
+    }
+  }, []);
+
   // Timer countdown effect
   useEffect(() => {
     const timer = setInterval(() => {
@@ -89,13 +104,9 @@ export default function Part3Page() {
   };
 
   const collectAllAnswers = (): TestAttemptSubmitDTO => {
-    // Get answers from localStorage for part 1 and 2
-    const part1Data = JSON.parse(
-      localStorage.getItem(`exam-${testId}-part1`) || "[]"
-    );
-    const part2Data = JSON.parse(
-      localStorage.getItem(`exam-${testId}-part2`) || "[]"
-    );
+    // Get answers from localStorage for part 1 and 2 using correct keys
+    const part1Data = JSON.parse(localStorage.getItem(`exam-1`) || "[]");
+    const part2Data = JSON.parse(localStorage.getItem(`exam-2`) || "[]");
 
     // Handle both old format (Record<number, string>) and new format (UserAnswerDTO[])
     const part1Answers: UserAnswerDTO[] = Array.isArray(part1Data)
@@ -138,7 +149,7 @@ export default function Part3Page() {
       const userId = storedUserId ? parseInt(storedUserId, 10) : 0;
 
       // Save current Part 3 answers to localStorage
-      localStorage.setItem(`exam-${testId}-part3`, JSON.stringify(answers));
+      localStorage.setItem(`exam-3`, JSON.stringify(answers));
 
       // Collect all answers from all parts
       const submitData = collectAllAnswers();
@@ -153,9 +164,9 @@ export default function Part3Page() {
       testService.storeAttemptIdLocally(testId, userId, result.id);
 
       // Clear localStorage for this exam
-      localStorage.removeItem(`exam-${testId}-part1`);
-      localStorage.removeItem(`exam-${testId}-part2`);
-      localStorage.removeItem(`exam-${testId}-part3`);
+      localStorage.removeItem(`exam-1`);
+      localStorage.removeItem(`exam-2`);
+      localStorage.removeItem(`exam-3`);
 
       // Show success toast
       toast.success("Test submitted successfully! Redirecting to results...");

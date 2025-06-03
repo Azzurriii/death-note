@@ -32,11 +32,42 @@ export default function Part1Page() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [timeRemaining, setTimeRemaining] = useState(8 * 60); // 8 minutes
 
+  // Load existing answers from localStorage on component mount
+  useEffect(() => {
+    const existingData = localStorage.getItem("exam-1");
+    if (existingData) {
+      try {
+        const parsedData = JSON.parse(existingData);
+        if (Array.isArray(parsedData)) {
+          // Convert UserAnswerDTO[] back to Record<number, string>
+          const answersMap: Record<number, string> = {};
+          parsedData.forEach((item: any) => {
+            if (item.question_id && item.user_answer) {
+              answersMap[item.question_id] = item.user_answer;
+            }
+          });
+          setAnswers(answersMap);
+        }
+      } catch (error) {
+        console.error("Error loading existing answers:", error);
+      }
+    }
+  }, []);
+
   // Timer countdown effect
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
+          // Save progress before auto-proceeding to Part 2
+          const submitAnswers = Object.entries(answers).map(
+            ([questionId, answer]) => ({
+              question_id: parseInt(questionId),
+              user_answer: answer,
+            })
+          );
+          localStorage.setItem(`exam-1`, JSON.stringify(submitAnswers));
+
           // Auto-proceed to Part 2 when time runs out
           router.push(`/exam/${testId}/part2`);
           return 0;
@@ -46,7 +77,7 @@ export default function Part1Page() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [testId, router]);
+  }, [testId, router, answers]);
 
   if (loading) {
     return (
@@ -83,7 +114,8 @@ export default function Part1Page() {
         user_answer: answer,
       })
     );
-    localStorage.setItem(`exam-${testId}-part1`, JSON.stringify(submitAnswers));
+    // Use consistent naming: exam-1 for part1 (questions 1-5)
+    localStorage.setItem(`exam-1`, JSON.stringify(submitAnswers));
     router.push(`/exam/${testId}/part2`);
   };
 
