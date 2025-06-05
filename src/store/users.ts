@@ -11,4 +11,10 @@ export const users = [
     name: "Trần Hà Linh",
     password: "123456",
   },
+  {
+    id: 3,
+    username: "niggathefirst",
+    name: "Gay Nig",
+    password: "123456",
+  },
 ];
