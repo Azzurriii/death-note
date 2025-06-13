@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
 
 export default function Part2Page() {
   const params = useParams();
@@ -227,7 +226,7 @@ export default function Part2Page() {
               </h3>
 
               <div className="bg-card border border-border rounded-xl p-6 mb-8 shadow-sm prose prose-base max-w-none">
-                <ReactMarkdown>{currentQuestion.prompt}</ReactMarkdown>
+                {currentQuestion.prompt}
               </div>
 
               <div className="space-y-4">
